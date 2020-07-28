@@ -1,0 +1,45 @@
+{%  extends 'accounts/main.html' %}
+
+{% block content %}
+
+	<br>
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+			<h5>Fatura:</h5>
+			<hr>
+			<a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'updateInvoice' invoice.id %}">Faturayı Güncelle</a>
+			<a class="btn btn-outline-danger  btn-sm btn-block" href="{% url 'deleteInvoice' invoice.id %}">Faturayı Sil</a>
+
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+			<table class="table table-sm">
+				<tr>
+					<th>Fatura Kodu</th>
+					<th>Satın Alınan Şirket</th>
+					<th>Fatura Kesim Tarihi</th>
+					<th>Tutar</th>
+					<th>Vergi Numarası</th>
+				</tr>
+
+				<tr>
+					<td>{{ invoice.invoiceCode}}</td>
+					<td>{{ invoice.vendor }}</td>
+					<td>{{ invoice.date }}</td>
+					<td>{{ invoice.sum }}</td>
+					<td>{{ invoice.taxNo }}</td>
+				<tr>
+
+			</table>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
