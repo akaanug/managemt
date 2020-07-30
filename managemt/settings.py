@@ -74,13 +74,22 @@ WSGI_APPLICATION = 'managemt.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
+mssql_pw = os.environ['MSSQL_PASSWORD']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE':'sql_server.pyodbc',
+        'NAME':'managemt',
+        'USER':'SA',
+        'PASSWORD':mssql_pw,
+        'HOST':'localhost',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+        },
     }
 }
+
+
 
 
 # Password validation
@@ -133,9 +142,11 @@ STATICFILES_DIRS = [
 
 #SMTP Configuration
 
+gmail_pw = os.environ['GMAIL_PASSWORD']
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'trysmtp0@gmail.com'
-EMAIL_HOST_PASSWORD = 'qumcoH-diwpog-5cughi'
+EMAIL_HOST_PASSWORD = gmail_pw
