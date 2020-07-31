@@ -74,15 +74,15 @@ WSGI_APPLICATION = 'managemt.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-mssql_pw = os.environ['MSSQL_PASSWORD']
+mssql_pw = os.environ['REMOTE_MSSQL_PASSWORD']
 
 DATABASES = {
     'default': {
         'ENGINE':'sql_server.pyodbc',
         'NAME':'managemt',
-        'USER':'SA',
+        'USER':'kaan',
         'PASSWORD':mssql_pw,
-        'HOST':'localhost',
+        'HOST':'managemt.cjbomnteku6w.us-east-2.rds.amazonaws.com',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
         },

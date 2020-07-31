@@ -16,11 +16,11 @@ class ProductForm(ModelForm):
     class Meta:
         model = Product
         fields = '__all__' #create form with all of the fields in Product
+
         widgets = {
             'name' : forms.TextInput(attrs={'placeholder': 'Ürün adını gir' }),
             'dateBought': DateInput(attrs={'type': 'date'}),
             'editor': forms.HiddenInput(),
-            #'criticalStock':
         }
 
         labels = {
