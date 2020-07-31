@@ -37,8 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'accounts',
+
     'django_filters',
+
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -150,3 +154,33 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'trysmtp0@gmail.com'
 EMAIL_HOST_PASSWORD = gmail_pw
+
+
+
+#S3 BUCKETS CONFIG
+
+aws_secret = os.environ['AWS_SECRET']
+aws_bucket_name = os.environ['AWS_BUCKET']
+aws_id = os.environ['AWS_ID']
+
+AWS_ACCESS_KEY_ID = aws_id
+AWS_SECRET_ACCESS_KEY = aws_secret
+AWS_STORAGE_BUCKET_NAME = aws_bucket_name
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+'''
+<?xml version="1.0" encoding="UTF-8"?>
+<CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+<CORSRule>
+    <AllowedOrigin>*</AllowedOrigin>
+    <AllowedMethod>GET</AllowedMethod>
+    <AllowedMethod>POST</AllowedMethod>
+    <AllowedMethod>PUT</AllowedMethod>
+    <AllowedHeader>*</AllowedHeader>
+</CORSRule>
+</CORSConfiguration>
+'''
