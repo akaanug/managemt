@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'lt-xr@gs*9hk6liido+@#!6rrgu_$g066#j+ye#@j&!uh+2u#i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['managemt.herokuapp.com/', '127.0.0.1']
 
 
 # Application definition
@@ -47,6 +47,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,7 +78,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'managemt.wsgi.application'
 
-
+'''
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 mssql_pw = os.environ['REMOTE_MSSQL_PASSWORD']
@@ -92,7 +95,14 @@ DATABASES = {
         },
     }
 }
+'''
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 
 
@@ -132,6 +142,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 STATIC_URL = '/static/'
 
 # for images
@@ -158,7 +170,7 @@ EMAIL_HOST_PASSWORD = gmail_pw
 
 
 #S3 BUCKETS CONFIG
-
+'''
 aws_secret = os.environ['AWS_SECRET']
 aws_bucket_name = os.environ['AWS_BUCKET']
 aws_id = os.environ['AWS_ID']
@@ -170,7 +182,7 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
+'''
 
 '''
 <?xml version="1.0" encoding="UTF-8"?>
