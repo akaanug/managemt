@@ -1,0 +1,47 @@
+{% extends 'accounts/main.html' %}
+{% load static %}
+{% block content %}
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function (event) {
+
+    var _selector = document.querySelector('input[name=criticalStock]');
+
+    //see if it was initially unchecked
+    if( _selector.checked == false ) {
+        document.querySelector('input[name=criticalStockAmt]').disabled = true;
+    }
+
+    _selector.addEventListener('change', function (event) {
+        if (_selector.checked) {
+            document.querySelector('input[name=criticalStockAmt]').disabled = false;
+        } else {
+            document.querySelector('input[name=criticalStockAmt]').value = null;
+            document.querySelector('input[name=criticalStockAmt]').disabled = true;
+        }
+    });
+});
+
+</script>
+
+
+<div class="row">
+    <div class="col-md">
+        <div class="car card-body">
+
+            <table>
+            <form action="" method="POST" enctype="multipart/form-data">
+
+                {% csrf_token %}
+                {{ form.as_table }}
+
+                <input type="submit" name="Submit" value="Gönder">
+            </form>
+        </table>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}
