@@ -202,5 +202,3 @@ def accountSettings(request):
 
     context = {'form':form}
     return render(request, 'accounts/account-settings.html',context )
-
-    
