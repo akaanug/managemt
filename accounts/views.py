@@ -202,3 +202,13 @@ def accountSettings(request):
 
     context = {'form':form}
     return render(request, 'accounts/account-settings.html',context )
+
+def autocomplete(request):
+    if 'term' in request.GET:
+        qs = Product.objects.name.filter(title__icontains=request.GET.get('term'))
+        titles = list()
+        for product in qs:
+            titles.append(product.title)
+        # titles = [product.title for product in qs]
+        return JsonResponse(titles, safe=False)
+    return render(request, 'accounts/product-form.html')
