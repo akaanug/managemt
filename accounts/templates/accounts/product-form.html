@@ -7,10 +7,39 @@
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script>
+    //all autocomplete functions:
     $(function () {
-        $("#name, #vendor, #category, #brand, #model, #description").autocomplete({
-            source: '{% url 'autocomplete' %}',
-            minLength: 2
+        $("#id_name").autocomplete({
+            source: '{% url 'autocompleteName' %}',
+            //minLength: 2
+        });
+    });
+
+    $(function () {
+        $("#id_vendor").autocomplete({
+            source: '{% url 'autocompleteVendor' %}',
+            //minLength: 2
+        });
+    });
+
+    $(function () {
+        $("#id_category").autocomplete({
+            source: '{% url 'autocompleteCategory' %}',
+            //minLength: 2
+        });
+    });
+
+    $(function () {
+        $("#id_model").autocomplete({
+            source: '{% url 'autocompleteModel' %}',
+            //minLength: 2
+        });
+    });
+
+    $(function () {
+        $("#id_brand").autocomplete({
+            source: '{% url 'autocompleteBrand' %}',
+            //minLength: 2
         });
     });
 </script>

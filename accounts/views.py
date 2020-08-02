@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth.models import Group
+from django.http import JsonResponse
 
 """
 @unauthenticated_user
@@ -203,12 +204,66 @@ def accountSettings(request):
     context = {'form':form}
     return render(request, 'accounts/account-settings.html',context )
 
-def autocomplete(request):
+def autocompleteName(request):
     if 'term' in request.GET:
-        qs = Product.objects.name.filter(title__icontains=request.GET.get('term'))
-        titles = list()
+        qs = Product.objects.filter(name__istartswith=request.GET.get('term'))
+        names = list()
         for product in qs:
-            titles.append(product.title)
+            if product.name not in names:
+                names.append(product.name)
         # titles = [product.title for product in qs]
-        return JsonResponse(titles, safe=False)
+        return JsonResponse(names, safe=False)
+    return render(request, 'accounts/product-form.html')
+
+
+def autocompleteVendor(request):
+    if 'term' in request.GET:
+        qs = Product.objects.filter(vendor__istartswith=request.GET.get('term'))
+        vendors = list()
+        for product in qs:
+            if product.vendor not in vendors:
+                vendors.append(product.vendor)
+
+        # titles = [product.title for product in qs]
+        return JsonResponse(vendors, safe=False)
+    return render(request, 'accounts/product-form.html')
+
+
+def autocompleteCategory(request):
+    if 'term' in request.GET:
+        qs = Product.objects.filter(category__istartswith=request.GET.get('term'))
+        categories = list()
+        for product in qs:
+            if product.category not in categories:
+                categories.append(product.category)
+
+        # titles = [product.title for product in qs]
+        return JsonResponse(categories, safe=False)
+    return render(request, 'accounts/product-form.html')
+
+
+def autocompleteModel(request):
+    if 'term' in request.GET:
+        qs = Product.objects.filter(model__istartswith=request.GET.get('term'))
+        models = list()
+
+        for product in qs:
+            if product.model not in models:
+                models.append(product.model)
+
+        # titles = [product.title for product in qs]
+        return JsonResponse(models, safe=False)
+    return render(request, 'accounts/product-form.html')
+
+
+def autocompleteBrand(request):
+    if 'term' in request.GET:
+        qs = Product.objects.filter(brand__istartswith=request.GET.get('term'))
+        brands = list()
+
+        for product in qs:
+            if product.brand not in brands:
+                brands.append(product.brand)
+        # titles = [product.title for product in qs]
+        return JsonResponse(brands, safe=False)
     return render(request, 'accounts/product-form.html')

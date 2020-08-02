@@ -56,7 +56,12 @@ urlpatterns = [
       name="password_reset_complete" ),
 
 
-    path('', views.autocomplete, name='autocomplete'),
+    path('autocompleteName/', views.autocompleteName, name='autocompleteName'),
+    path('autocompleteVendor/', views.autocompleteVendor, name='autocompleteVendor'),
+    path('autocompleteCategory/', views.autocompleteCategory, name='autocompleteCategory'),
+    path('autocompleteModel/', views.autocompleteModel, name='autocompleteModel'),
+    path('autocompleteBrand/', views.autocompleteBrand, name='autocompleteBrand'),
 ]
 
+#for images
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
