@@ -1,3 +1,4 @@
 unixodbc
 unixodbc-dev
 django-mssql-backend
+pyodbc
