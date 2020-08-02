@@ -1,2 +1,4 @@
 unixodbc
 unixodbc-dev
+pyodbc==4.0.30
+django-mssql-backend==2.8.1
