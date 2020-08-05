@@ -107,14 +107,29 @@ def invoice(request, pk):
 
 @login_required(login_url='login')
 def addProduct(request):
-    form = ProductForm(initial={ 'editor':request.user.username })
+    productForm = ProductForm(initial={ 'editor':request.user.username })
+    invoiceForm = InvoiceForm()
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
+        invoiceForm = InvoiceForm(request.POST)
+        productForm = ProductForm(request.POST, request.FILES)
+        if invoiceForm.is_valid() and productForm.is_valid() :
+            newProduct = productForm.save()
+            newInvoice = invoiceForm.save()
+
+            #fill invoice based on information in newProduct
+            sum = newProduct.price * newProduct.amount
+            newInvoice.sum = sum
+            newInvoice.vendor = newProduct.vendor
+            newInvoice.date = newProduct.dateBought
+            newInvoice.save()
+
+            #link invoice to product
+            newProduct.invoice = newInvoice
+            newProduct.save()
+
             return redirect('/')
 
-    context = { 'form': form }
+    context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
     return render(request, 'accounts/product-form.html', context)
 
 @login_required(login_url='login')

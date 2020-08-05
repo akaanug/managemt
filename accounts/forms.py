@@ -18,8 +18,8 @@ class ProductForm(ModelForm):
         fields = '__all__' #create form with all of the fields in Product
 
         widgets = {
-            'name' : forms.TextInput(attrs={'placeholder': 'Ürün adını gir' }),
-            'dateBought': DateInput(attrs={'type': 'date'}),
+            'name' : forms.TextInput(attrs={'placeholder': 'Ürün adını gir', }),
+            'dateBought': DateInput(attrs={'type': 'date', }),
             'editor': forms.HiddenInput(),
         }
 
@@ -39,8 +39,9 @@ class ProductForm(ModelForm):
             'model' : 'Model',
             'description' : 'Açıklama',
             'editor' : 'Kaydeden Kullanıcı',
-            'invoice' : 'Fatura'
         }
+
+        exclude = ( 'invoice', )
 
 class InvoiceForm(ModelForm):
     class Meta:

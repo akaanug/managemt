@@ -68,23 +68,39 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 </script>
 
+<table>
+    <form action="" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            {% csrf_token %}
+            {{ productForm }}
+        </div>
+        <div class="form-group">
+            <p></p>
+            <tbody>
+                <tr>
+                    <th>
+                        {{ invoiceForm.invoiceCode.label }}:
+                    </th>
+                    <td>
+                        {{ invoiceForm.invoiceCode }}
+                    </td>
+                </tr>
 
-<div class="row">
-    <div class="col-md">
-        <div class="car card-body">
+                <tr>
+                    <th>
+                        {{ invoiceForm.taxNo.label }}:
+                    </th>
+                    <td>
+                        {{ invoiceForm.taxNo }}
+                    </td>
+                </tr>
 
-            <table>
-            <form action="" method="POST" enctype="multipart/form-data">
-
-                {% csrf_token %}
-                {{ form.as_table }}
-
-                <input type="submit" name="Submit" value="Gönder">
-            </form>
-        </table>
+            </tbody>
 
         </div>
-    </div>
-</div>
+
+    <input type="submit" name="Submit" value="Gönder">
+    </form>
+</table>
 
 {% endblock %}

@@ -27,11 +27,11 @@ class Product(models.Model):
         return f"{self.name} {self.barcode} {self.code}"
 
 class Invoice(models.Model): #fatura
-    invoiceCode = models.CharField(max_length = 200)
-    vendor = models.CharField(max_length=200) #faturayı kesen firma
-    date = models.DateField(null=True) #fatura kesim tarihi
-    sum = models.FloatField() #tutar
-    taxNo = models.CharField(max_length=200) #vergi numarası
+    invoiceCode = models.CharField( max_length = 200 )
+    vendor = models.CharField( max_length=200, blank=True, null=True ) #faturayı kesen firma
+    date = models.DateField( blank=True, null=True) #fatura kesim tarihi
+    sum = models.FloatField( blank=True, null=True ) #tutar
+    taxNo = models.CharField( max_length=200, blank=True, null=True ) #vergi numarası
 
     def __str__(self):
         return f" {self.invoiceCode}"
