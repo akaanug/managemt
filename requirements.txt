@@ -9,6 +9,7 @@ docutils==0.15.2
 gunicorn==20.0.4
 jmespath==0.10.0
 Pillow==7.2.0
+psycopg2==2.8.5
 python-dateutil==2.8.1
 pytz==2020.1
 reportlab==3.5.46
