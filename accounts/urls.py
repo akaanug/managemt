@@ -61,6 +61,8 @@ urlpatterns = [
     path('autocompleteCategory/', views.autocompleteCategory, name='autocompleteCategory'),
     path('autocompleteModel/', views.autocompleteModel, name='autocompleteModel'),
     path('autocompleteBrand/', views.autocompleteBrand, name='autocompleteBrand'),
+
+    path('reportPage/', views.report, name='report' ),
 ]
 
 #for images

@@ -12,6 +12,13 @@ from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth.models import Group
 from django.http import JsonResponse
 
+
+import reportlab
+import io
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
+
+
 """
 @unauthenticated_user
 def registerPage(request):
@@ -136,15 +143,17 @@ def addProduct(request):
 @allowed_users(allowed_roles=['admin'])
 def updateProduct(request, pk):
     product = Product.objects.get(id=pk)
-    form = ProductForm(initial={'editor' : request.user.username}, instance = product)
-
+    productForm = ProductForm(initial={'editor' : request.user.username}, instance = product)
+    invoiceForm = InvoiceForm(instance = product.invoice)
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES, instance = product)
-        if form.is_valid():
-            form.save()
+        productForm = ProductForm(request.POST, request.FILES, instance = product)
+        invoiceForm = InvoiceForm( request.POST, instance = product.invoice )
+        if productForm.is_valid() and invoiceForm.is_valid():
+            productForm.save()
+            invoiceForm.save()
             return redirect('/')
 
-    context = { 'form': form }
+    context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
     return render(request, 'accounts/product-form.html', context)
 
 @login_required(login_url='login')
@@ -282,3 +291,29 @@ def autocompleteBrand(request):
         # titles = [product.title for product in qs]
         return JsonResponse(brands, safe=False)
     return render(request, 'accounts/product-form.html')
+
+
+def report(request):
+
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    p = canvas.Canvas(buffer)
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+
+    if request.method == "POST":
+        # Draw things on the PDF. Here's where the PDF generation happens.
+        # See the ReportLab documentation for the full list of functionality.
+        p.drawString(100, 100, "Hello world.")
+
+        # Close the PDF object cleanly, and we're done.
+        p.showPage()
+        p.save()
+        return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
+
+    context = {}
+    return render(request, 'accounts/reportPage.html', context)

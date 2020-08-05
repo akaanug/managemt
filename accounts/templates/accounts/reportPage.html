@@ -1,0 +1,10 @@
+{% extends 'accounts/main.html' %}
+{% load static %}
+{% block content %}
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <input class="btn btn-danger" type="submit" name="submit", value="Rapor Hazırla">
+</form>
+
+{% endblock %}
