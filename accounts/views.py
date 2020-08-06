@@ -18,6 +18,7 @@ from django.views import View
 from django.template.loader import get_template
 from io import BytesIO
 from django.utils import timezone
+from datetime import datetime as dt
 
 
 
@@ -77,10 +78,6 @@ def home(request):
             criticalProducts.append(product)
         if product.amount == 0:
             outOfStock.append(product)
-
-    sum = 0
-    for product in products:
-        sum += product.price * product.amount
 
     start = 5
     if products.count() <= 5:
@@ -299,7 +296,7 @@ def render_to_pdf(template_src, context_dict={}):
     template = get_template(template_src)
     html = template.render(context_dict)
     result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html.encode("utf-8")), result)
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
     if not pdf.err:
         return HttpResponse(result.getvalue(), content_type='application/pdf')
     return None
@@ -310,8 +307,20 @@ class ViewPDF(View):
     def get(self, request, *args, **kwargs):
         #get all products in the current month & year
         qs = Product.objects.filter(regDate__gte=timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0))
-        print(qs)
-        products = qs.__dict__
+
+        sum = 0
+        for product in qs:
+            sum += product.price * product.amount
+
+        date = dt.today()
+        fileext = str(date.month) + "/" + str(date.year)
+
+        products = {
+            'products': qs,
+            'sum': sum,
+            'date': fileext,
+        }
+
         pdf = render_to_pdf('accounts/pdf_template.html', products)
         return HttpResponse(pdf, content_type='application/pdf')
 
@@ -320,15 +329,25 @@ class ViewPDF(View):
 class DownloadPDF(View):
     def get(self, request, *args, **kwargs):
         #get all products in the current month & year
-        qs = Product.objects.filter(
-            regDate__gte=timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0))
+        qs = Product.objects.filter(regDate__gte=timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0))
 
-        products = qs.__dict__
+        sum = 0
+        for product in qs:
+            sum += product.price * product.amount
+
+        date = dt.today()
+        fileext = str(date.month) + "/" + str(date.year)
+
+        products = {
+            'products': qs,
+            'sum': sum,
+            'date': fileext,
+        }
 
         pdf = render_to_pdf('accounts/pdf_template.html', products)
         response = HttpResponse(pdf, content_type='application/pdf')
-        filename = "Product_%s.pdf" %("12341231")
-        content = "attachment; filename='%s'" %(filename)
+        filename = "AylikRapor_%s.pdf" %(fileext)
+        content = "attachment; filename=%s" %(filename)
         response['Content-Disposition'] = content
         return response
 
