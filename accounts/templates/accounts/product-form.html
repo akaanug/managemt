@@ -68,8 +68,28 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 </script>
 
+<!--  alert when criticalStock is required but not filled -->
+<script>
+
+function required() {
+    var _selector = document.querySelector('input[name=criticalStock]');
+    var inputField = document.querySelector('input[name=criticalStockAmt]');
+
+    if ( (_selector.checked == true) && (inputField.value === "") ) {
+        alert("Lütfen kritik stok bilgisi girin.");
+        return false;
+    } else {
+        //alert('Yeni ürün kaydedildi');
+        return true;
+    }
+}
+
+</script>
+
+
+
 <table>
-    <form action="" method="POST" enctype="multipart/form-data">
+    <form action="" method="POST" enctype="multipart/form-data" onsubmit="return required()">
         <div class="form-group">
             {% csrf_token %}
             {{ productForm }}

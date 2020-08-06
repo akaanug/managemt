@@ -13,10 +13,12 @@ from django.contrib.auth.models import Group
 from django.http import JsonResponse
 
 
-import reportlab
-import io
-from django.http import FileResponse
-from reportlab.pdfgen import canvas
+from xhtml2pdf import pisa
+from django.views import View
+from django.template.loader import get_template
+from io import BytesIO
+from django.utils import timezone
+
 
 
 """
@@ -293,27 +295,44 @@ def autocompleteBrand(request):
     return render(request, 'accounts/product-form.html')
 
 
+def render_to_pdf(template_src, context_dict={}):
+    template = get_template(template_src)
+    html = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("utf-8")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
+
+
+#Opens up page as PDF
+class ViewPDF(View):
+    def get(self, request, *args, **kwargs):
+        #get all products in the current month & year
+        qs = Product.objects.filter(regDate__gte=timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0))
+        print(qs)
+        products = qs.__dict__
+        pdf = render_to_pdf('accounts/pdf_template.html', products)
+        return HttpResponse(pdf, content_type='application/pdf')
+
+
+#Automaticly downloads to PDF file
+class DownloadPDF(View):
+    def get(self, request, *args, **kwargs):
+        #get all products in the current month & year
+        qs = Product.objects.filter(
+            regDate__gte=timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0))
+
+        products = qs.__dict__
+
+        pdf = render_to_pdf('accounts/pdf_template.html', products)
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "Product_%s.pdf" %("12341231")
+        content = "attachment; filename='%s'" %(filename)
+        response['Content-Disposition'] = content
+        return response
+
+
 def report(request):
-
-    if request.method == "POST":
-        # Create a file-like buffer to receive PDF data.
-        buffer = io.BytesIO()
-
-        # Create the PDF object, using the buffer as its "file."
-        p = canvas.Canvas(buffer)
-
-        # FileResponse sets the Content-Disposition header so that browsers
-        # present the option to save the file.
-        buffer.seek(0)
-
-        # Draw things on the PDF. Here's where the PDF generation happens.
-        # See the ReportLab documentation for the full list of functionality.
-        p.drawString(100, 100, "Hello world.")
-
-        # Close the PDF object cleanly, and we're done.
-        p.showPage()
-        p.save()
-        return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
-
     context = {}
     return render(request, 'accounts/reportPage.html', context)

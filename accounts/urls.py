@@ -63,6 +63,8 @@ urlpatterns = [
     path('autocompleteBrand/', views.autocompleteBrand, name='autocompleteBrand'),
 
     path('reportPage/', views.report, name='report' ),
+    path('pdf_view/', views.ViewPDF.as_view(), name="pdf_view"),
+    path('pdf_download/', views.DownloadPDF.as_view(), name="pdf_download"),
 ]
 
 #for images
