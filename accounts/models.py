@@ -22,7 +22,9 @@ class Product(models.Model):
     description = models.CharField(max_length = 400, blank=True, null=True) #açıklama
     editor = models.CharField(max_length = 200) #ürünü kaydeden/silen kullanıcı
     invoice = models.OneToOneField('Invoice', on_delete=models.CASCADE, related_name="fatura", null=True, blank=True )
-    history = HistoricalRecords()
+    history = HistoricalRecords(
+        history_change_reason_field=models.TextField(null=True, max_length=255)
+    )
 
     def __str__(self):
         return f"{self.name} {self.barcode} {self.code}"
