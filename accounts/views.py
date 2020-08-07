@@ -20,7 +20,8 @@ from io import BytesIO
 from django.utils import timezone
 from datetime import datetime as dt
 
-
+import simple_history
+from simple_history.utils import update_change_reason
 
 """
 @unauthenticated_user
@@ -120,6 +121,7 @@ def addProduct(request):
         productForm = ProductForm(request.POST, request.FILES)
         if invoiceForm.is_valid() and productForm.is_valid() :
             newProduct = productForm.save()
+            update_change_reason(newProduct, "Ürün eklendi.")
             newInvoice = invoiceForm.save()
 
             #fill invoice based on information in newProduct
@@ -132,11 +134,57 @@ def addProduct(request):
             #link invoice to product
             newProduct.invoice = newInvoice
             newProduct.save()
+            update_change_reason(newProduct, "Fatura eklendi.")
 
             return redirect('/')
 
     context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
     return render(request, 'accounts/product-form.html', context)
+
+
+#get change of last two histories as string
+def getHistoryLabel(product):
+
+    #translate English labels to Turkish
+    translateDict = {
+        "name": "Ürün Adı",
+        "barcode": "Barkod",
+        "code": "Ürün Kodu",
+        "regDate":"Kayıt Tarihi",
+        "price" : "Fiyat",
+        "amount" : "Adet",
+        "category": "Kategori",
+        "brand": "Marka",
+        "model": "Model",
+        "description" : "Açıklama",
+        "editor": "Düzenleyen Kullanıcı",
+        "photo": "Fotoğraf",
+        "vendor": "Alınan Şirket",
+        "criticalStock": "Kritik Stok",
+        "criticalStockAmt" : "Kritik Stok Sayısı",
+        "dateBought": "Alış Tarihi",
+        "invoice": "Fatura",
+        "history": "Tarih",
+    }
+
+
+    histories = product.history.all()
+
+    #get last record
+    new_record = histories.first()
+    #get older record
+    old_record = new_record.prev_record
+
+    delta = new_record.diff_against(old_record)
+
+    s = ""
+    for change in delta.changes:
+        s += ("{}, {} iken {} olarak değiştirildi. ".format(translateDict[change.field],
+         change.old, change.new))
+
+    return s
+
+
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['admin'])
@@ -149,6 +197,7 @@ def updateProduct(request, pk):
         invoiceForm = InvoiceForm( request.POST, instance = product.invoice )
         if productForm.is_valid() and invoiceForm.is_valid():
             productForm.save()
+            update_change_reason(product, getHistoryLabel(product))
             invoiceForm.save()
             return redirect('/')
 
@@ -340,10 +389,7 @@ class DownloadPDF(View):
         sum = 0
         for product in qs:
             sum += product.price * product.amount
-
-        date = dt.today()
-        fileext = str(date.month) + "/" + str(date.year)
-
+            
         products = {
             'products': qs,
             'sum': sum,
@@ -352,12 +398,12 @@ class DownloadPDF(View):
 
         pdf = render_to_pdf('accounts/pdf_template.html', products)
         response = HttpResponse(pdf, content_type='application/pdf')
-        filename = "DTS_Rapor_%s.pdf" %(fileext)
+        filename = "DTS_Rapor_%s.pdf" %(date)
         content = "attachment; filename=%s" %(filename)
         response['Content-Disposition'] = content
         return response
 
-
+@login_required
 def report(request):
     current_date = dt.today().date()
     date = current_date

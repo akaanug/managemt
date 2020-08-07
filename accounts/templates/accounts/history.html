@@ -8,17 +8,15 @@
 			<table class="table table-sm">
 				<tr>
 					<th>Tarih</th>
-					<th>Açıklama</th>
-					<th>Değiştiren Kullanıcı</th>
-					<th>Değiştirme Sebebi</th>
+					<th>Düzenleyen Kullanıcı</th>
+					<th>Düzenleme Sebebi</th>
 				</tr>
 
                 {% for history in histories %}
 				<tr>
 					<td>{{ history.history_date }}</td>
-					<td>{{ history.history_type }}</td>
-					<td>{{ invoice.history_user}}</td>
-					<td>{{ invoice.history_change_reason }}</td>
+					<td>{{ history.history_user }}</td>
+					<td>{{ history.history_change_reason }}</td>
 				<tr>
                 {% endfor %}
 
