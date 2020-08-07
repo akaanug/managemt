@@ -2,16 +2,25 @@
 {% load static %}
 {% block content %}
 
+
 <div class="container">
 		<div class="row">
 			<div class="col-md"></div>
 
 			<div class="col-md">
 				<div class="card card-body">
+
+					<form id="dateForm" action="" method="post">
+						{% csrf_token %}
+						<label for="tarih">Tarihi gir:</label>
+						<input type="date" id="date" name="date" value="{{ date|date:"Y-m-d" }}" oninput="submit()">
+					</form>
+
 					 <div class="text-center">
-					<h3>Aylık raporu göster ya da indir.</h3>
-					<a class="btn btn-info" href="{% url 'pdf_view' %}" target="_blank">Raporu Göster</a>
-					<a class="btn btn-info"  href="{% url 'pdf_download' %}">Raporu İndir</a>
+						 <p>Seçilen tarih: {{date}}</p>
+						<h3>Girilen tarihteki güncel raporu göster ya da indir.</h3>
+						<a class="btn btn-info" href="{% url 'pdf_view' date %}" target="_blank">Raporu Göster</a>
+						<a class="btn btn-info"  href="{% url 'pdf_download' date %}">Raporu İndir</a>
 					</div>
 				</div>
 			</div>

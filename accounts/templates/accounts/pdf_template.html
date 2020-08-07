@@ -32,7 +32,7 @@
     <!-- Content for Static Frame 'header_frame' -->
     <div id="header_content" class='header'>
     	<h3>BİLKENT CYBERPARK Ankara Teknoloji Geliştirme Bölgesi Kurucu ve İşletici A.Ş.</h3>
-        <h3>{{date}} AYLIK RAPORU</h3>
+        <h3>{{date}} TARİHLİ RAPOR</h3>
     </div>
 
     <!-- Content for Static Frame 'footer_frame' -->
@@ -53,8 +53,6 @@
             <th>Kategori</th>
             <th>Marka</th>
             <th>Model</th>
-            <th>Açıklama</th>
-            <th>Kaydeden Kullanıcı</th>
         </tr>
 
         {% for product in products %}
@@ -69,8 +67,6 @@
                 <td>{{ product.category }}</td>
                 <td>{{ product.brand }}</td>
                 <td>{{ product.model }}</td>
-                <td>{{ product.description }}</td>
-                <td>{{ product.editor }}</td>
             </tr>
         {% endfor %}
 

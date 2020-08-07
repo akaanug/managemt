@@ -1,6 +1,6 @@
 from django.db import models
 import datetime
-
+from simple_history.models import HistoricalRecords
 
 # Create your models here.
 
@@ -22,6 +22,7 @@ class Product(models.Model):
     description = models.CharField(max_length = 400, blank=True, null=True) #açıklama
     editor = models.CharField(max_length = 200) #ürünü kaydeden/silen kullanıcı
     invoice = models.OneToOneField('Invoice', on_delete=models.CASCADE, related_name="fatura", null=True, blank=True )
+    history = HistoricalRecords()
 
     def __str__(self):
         return f"{self.name} {self.barcode} {self.code}"
@@ -32,6 +33,7 @@ class Invoice(models.Model): #fatura
     date = models.DateField( blank=True, null=True) #fatura kesim tarihi
     sum = models.FloatField( blank=True, null=True ) #tutar
     taxNo = models.CharField( max_length=200, blank=True, null=True ) #vergi numarası
+    history = HistoricalRecords()
 
     def __str__(self):
         return f" {self.invoiceCode}"

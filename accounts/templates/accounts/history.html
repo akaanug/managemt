@@ -1,0 +1,30 @@
+{%  extends 'accounts/main.html' %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+			<table class="table table-sm">
+				<tr>
+					<th>Tarih</th>
+					<th>Açıklama</th>
+					<th>Değiştiren Kullanıcı</th>
+					<th>Değiştirme Sebebi</th>
+				</tr>
+
+                {% for history in histories %}
+				<tr>
+					<td>{{ history.history_date }}</td>
+					<td>{{ history.history_type }}</td>
+					<td>{{ invoice.history_user}}</td>
+					<td>{{ invoice.history_change_reason }}</td>
+				<tr>
+                {% endfor %}
+
+			</table>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

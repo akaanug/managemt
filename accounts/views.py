@@ -305,20 +305,22 @@ def render_to_pdf(template_src, context_dict={}):
 #Opens up page as PDF
 class ViewPDF(View):
     def get(self, request, *args, **kwargs):
-        #get all products in the current month & year
-        qs = Product.objects.filter(regDate__gte=timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0))
+
+        #pass date parameter as string and convert it back to datetime.datetime
+        date = kwargs['date']
+        dateObj = dt.strptime(date, '%Y-%m-%d')
+
+        #get all products in specified date
+        qs = Product.objects.filter(regDate__lte=dateObj)
 
         sum = 0
         for product in qs:
             sum += product.price * product.amount
 
-        date = dt.today()
-        fileext = str(date.month) + "/" + str(date.year)
-
         products = {
             'products': qs,
             'sum': sum,
-            'date': fileext,
+            'date': date,
         }
 
         pdf = render_to_pdf('accounts/pdf_template.html', products)
@@ -328,8 +330,12 @@ class ViewPDF(View):
 #Automaticly downloads to PDF file
 class DownloadPDF(View):
     def get(self, request, *args, **kwargs):
-        #get all products in the current month & year
-        qs = Product.objects.filter(regDate__gte=timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0))
+        #pass date parameter as string and convert it back to datetime.datetime
+        date = kwargs['date']
+        dateObj = dt.strptime(date, '%Y-%m-%d')
+
+        #get all products in specified date
+        qs = Product.objects.filter(regDate__lte=dateObj)
 
         sum = 0
         for product in qs:
@@ -341,17 +347,32 @@ class DownloadPDF(View):
         products = {
             'products': qs,
             'sum': sum,
-            'date': fileext,
+            'date': date,
         }
 
         pdf = render_to_pdf('accounts/pdf_template.html', products)
         response = HttpResponse(pdf, content_type='application/pdf')
-        filename = "AylikRapor_%s.pdf" %(fileext)
+        filename = "DTS_Rapor_%s.pdf" %(fileext)
         content = "attachment; filename=%s" %(filename)
         response['Content-Disposition'] = content
         return response
 
 
 def report(request):
-    context = {}
+    current_date = dt.today().date()
+    date = current_date
+
+    if request.method=="POST":
+        date = request.POST.get('date')
+        print(date)
+
+    context = { 'date' : date }
     return render(request, 'accounts/reportPage.html', context)
+
+
+@login_required(login_url='login')
+def history(request, pk):
+    product = Product.objects.get(id=pk)
+    histories = product.history.all()
+    context = {'histories': histories}
+    return render( request, 'accounts/history.html', context )

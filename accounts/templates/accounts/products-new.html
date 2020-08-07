@@ -50,6 +50,8 @@
                           {% else %}
                              <a class="btn btn-sm btn-danger" href="{% url 'updateProduct' product.id %}">Fotoğraf Ekle</a>
                           {% endif %}
+
+                          <a class="btn btn-sm btn-info" href="{% url 'history-path' product.id %}">Geçmiş</a>
                       </td>
                   </div>
                   <td>{{ product.name }}</td>

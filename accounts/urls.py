@@ -29,6 +29,9 @@ urlpatterns = [
     path('user', views.userPage, name='user-page'),
     path('products/', views.products, name='products'),
     path('invoice/<str:pk>/', views.invoice, name='invoice-path'),
+
+    path('history/<str:pk>/', views.history, name='history-path'),
+
     path('addProduct/', views.addProduct, name="addProduct"),
     path('updateProduct/<str:pk>', views.updateProduct, name="updateProduct"),
     path('deleteProduct/<str:pk>', views.deleteProduct, name="deleteProduct"),
@@ -62,9 +65,9 @@ urlpatterns = [
     path('autocompleteModel/', views.autocompleteModel, name='autocompleteModel'),
     path('autocompleteBrand/', views.autocompleteBrand, name='autocompleteBrand'),
 
-    path('reportPage/', views.report, name='report' ),
-    path('pdf_view/', views.ViewPDF.as_view(), name="pdf_view"),
-    path('pdf_download/', views.DownloadPDF.as_view(), name="pdf_download"),
+    path('reportPage/', views.report, name='report'),
+    path('pdf_view/<str:date>', views.ViewPDF.as_view(), name="pdf_view"),
+    path('pdf_download/<str:date>', views.DownloadPDF.as_view(), name="pdf_download"),
 ]
 
 #for images
