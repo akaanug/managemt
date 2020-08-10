@@ -72,6 +72,29 @@
 
     </table>
 
+    <br><br><br>
+
+    <h3>Seçilen Günde Yapılan İşlemler:</h3>
+    <table class="table">
+        <tr>
+            <th>Ürün Adı</th>
+            <th>Ürün Barkodu</th>
+            <th>Değişiklik Yapan</th>
+            <th>Değişikliği Sebebi</th>
+        </tr>
+
+        {% for history in allHistories %}
+            <tr>
+            <td>{{ history.name }}</td>
+            <td>{{ history.barcode }}</td>
+            <td>{{ history.history_user }}</td>
+            <td>{{ history.history_change_reason }}</td>
+            </tr>
+        {% endfor %}
+
+    </table>
+
+
     <hr>
 
     <p><strong>Toplam: {{sum}} TL</strong></p>

@@ -23,6 +23,8 @@ from datetime import datetime as dt
 import simple_history
 from simple_history.utils import update_change_reason
 
+import pytz
+
 """
 @unauthenticated_user
 def registerPage(request):
@@ -355,21 +357,65 @@ def render_to_pdf(template_src, context_dict={}):
 class ViewPDF(View):
     def get(self, request, *args, **kwargs):
 
+        utc = pytz.UTC
+
         #pass date parameter as string and convert it back to datetime.datetime
         date = kwargs['date']
         dateObj = dt.strptime(date, '%Y-%m-%d')
 
+        #dateObj points to the end of the day
+        time = datetime.time(23,59,59)
+        endOfTheDay = dt.combine(dateObj, time)
+
         #get all products in specified date
-        qs = Product.objects.filter(regDate__lte=dateObj)
+        qs = Product.objects.filter(regDate__lte=endOfTheDay)
+
+        products = []
+
+        #get an instance of the model as it would
+        #have existed at the provided date
+        for product in qs:
+            hist = None
+
+            #if product is not created yet
+            try:
+                hist = product.history.as_of(endOfTheDay)
+            except Exception as ex:
+                print(ex)
+
+            if hist is not None:
+                products.append( hist )
 
         sum = 0
-        for product in qs:
+        for product in products:
             sum += product.price * product.amount
 
+        #get beginning of the day in order to find all operations in that day
+        time = datetime.time(0,0,0)
+        beginningOfTheDay = dt.combine(dateObj, time)
+
+        allHistories = []
+
+        #By default, the datetime object is naive in Python, so you need to
+        #make both of them either naive or aware datetime objects.
+        #This can be done using:
+        beginningOfTheDay = utc.localize(beginningOfTheDay)
+        endOfTheDay = utc.localize(endOfTheDay)
+
+        #Get all processes made in chosen day
+        allProducts = Product.objects.all()
+        for product in allProducts:
+            productHistories = product.history.all()
+
+            for history in productHistories:
+                if (history.history_date >= beginningOfTheDay) and (history.history_date <= endOfTheDay):
+                    allHistories.append(history)
+
         products = {
-            'products': qs,
+            'products': products,
             'sum': sum,
             'date': date,
+            'allHistories': allHistories,
         }
 
         pdf = render_to_pdf('accounts/pdf_template.html', products)
@@ -379,21 +425,67 @@ class ViewPDF(View):
 #Automaticly downloads to PDF file
 class DownloadPDF(View):
     def get(self, request, *args, **kwargs):
+        
+        #pass date parameter as string and convert it back to datetime.datetime
+        utc = pytz.UTC
+
         #pass date parameter as string and convert it back to datetime.datetime
         date = kwargs['date']
         dateObj = dt.strptime(date, '%Y-%m-%d')
 
+        #dateObj points to the end of the day
+        time = datetime.time(23,59,59)
+        endOfTheDay = dt.combine(dateObj, time)
+
         #get all products in specified date
-        qs = Product.objects.filter(regDate__lte=dateObj)
+        qs = Product.objects.filter(regDate__lte=endOfTheDay)
+
+        products = []
+
+        #get an instance of the model as it would
+        #have existed at the provided date
+        for product in qs:
+            hist = None
+
+            #if product is not created yet
+            try:
+                hist = product.history.as_of(endOfTheDay)
+            except Exception as ex:
+                print(ex)
+
+            if hist is not None:
+                products.append( hist )
 
         sum = 0
-        for product in qs:
+        for product in products:
             sum += product.price * product.amount
-            
+
+        #get beginning of the day in order to find all operations in that day
+        time = datetime.time(0,0,0)
+        beginningOfTheDay = dt.combine(dateObj, time)
+
+        allHistories = []
+
+        #By default, the datetime object is naive in Python, so you need to
+        #make both of them either naive or aware datetime objects.
+        #This can be done using:
+        beginningOfTheDay = utc.localize(beginningOfTheDay)
+        endOfTheDay = utc.localize(endOfTheDay)
+
+        #Get all processes made in chosen day
+        allProducts = Product.objects.all()
+        for product in allProducts:
+            productHistories = product.history.all()
+
+            for history in productHistories:
+                if (history.history_date >= beginningOfTheDay) and (history.history_date <= endOfTheDay):
+                    allHistories.append(history)
+
         products = {
-            'products': qs,
+            'products': products,
             'sum': sum,
             'date': date,
+            'allHistories': allHistories,
         }
 
         pdf = render_to_pdf('accounts/pdf_template.html', products)
@@ -410,7 +502,6 @@ def report(request):
 
     if request.method=="POST":
         date = request.POST.get('date')
-        print(date)
 
     context = { 'date' : date }
     return render(request, 'accounts/reportPage.html', context)
