@@ -19,16 +19,12 @@
           font-family: 'Helvetica';
           src: url(./static/fonts/Helvetica.ttc);
         }
-
-        body {
-            font-family: 'Helvetica'
-        }
-
     }
 </style>
 </head>
 
 <body>
+
     <!-- Content for Static Frame 'header_frame' -->
     <div id="header_content" class='header'>
     	<h3>BİLKENT CYBERPARK Ankara Teknoloji Geliştirme Bölgesi Kurucu ve İşletici A.Ş.</h3>
@@ -43,20 +39,19 @@
     <!-- HTML Content -->
     <table class="table">
         <tr>
-            <th>Ürün Adı</th>
-            <th>Barkod</th>
-            <th>Ürün kodu</th>
-            <th>Satın Alınan Firma</th>
-            <th>Kayıt Tarihi</th>
-            <th>Fiyat</th>
-            <th>Adet</th>
-            <th>Kategori</th>
-            <th>Marka</th>
-            <th>Model</th>
+            <th align="left">Ürün Adı</th>
+            <th align="left">Barkod</th>
+            <th align="left">Ürün kodu</th>
+            <th align="left">Satın Alınan Firma</th>
+            <th align="left">Kayıt Tarihi</th>
+            <th align="left">Fiyat</th>
+            <th align="left">Adet</th>
+            <th align="left">Kategori</th>
+            <th align="left">Marka</th>
+            <th align="left">Model</th>
         </tr>
-
         {% for product in products %}
-            <tr>
+            <tr align="left">
                 <td>{{ product.name }}</td>
                 <td>{{ product.barcode }}</td>
                 <td>{{ product.code }}</td>
@@ -80,18 +75,18 @@
     <h3>Seçilen Günde Yapılan İşlemler:</h3>
     <table class="table">
         <tr>
-            <th>Ürün Adı</th>
-            <th>Ürün Barkodu</th>
-            <th>Değişiklik Yapan</th>
-            <th>Değişikliği Sebebi</th>
+            <th align="left">Ürün Adı</th>
+            <th align="left">Ürün Barkodu</th>
+            <th align="left">Değişiklik Yapan</th>
+            <th align="left">Değişikliği Sebebi</th>
         </tr>
 
         {% for history in allHistories %}
-            <tr>
-            <td>{{ history.name }}</td>
-            <td>{{ history.barcode }}</td>
-            <td>{{ history.history_user }}</td>
-            <td>{{ history.history_change_reason }}</td>
+            <tr align="left">
+                <td>{{ history.name }}</td>
+                <td>{{ history.barcode }}</td>
+                <td>{{ history.history_user }}</td>
+                <td>{{ history.history_change_reason }}</td>
             </tr>
         {% endfor %}
 

@@ -425,7 +425,7 @@ class ViewPDF(View):
 #Automaticly downloads to PDF file
 class DownloadPDF(View):
     def get(self, request, *args, **kwargs):
-        
+
         #pass date parameter as string and convert it back to datetime.datetime
         utc = pytz.UTC
 
