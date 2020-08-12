@@ -23,9 +23,9 @@ from datetime import datetime as dt
 import simple_history
 from simple_history.utils import update_change_reason
 
-import pytz
+#import pytz
 
-#import cv2
+import cv2
 #from pyzbar import pyzbar
 
 """
