@@ -1,0 +1,40 @@
+{%  extends 'accounts/main.html' %}
+
+{% block content %}
+
+<script src="../static/js/quagga.js"> </script>
+
+<div id="result"></div>
+
+<div id="camera"></div>
+
+<script>
+
+    Quagga.init({
+    inputStream : {
+      name : "Live",
+      type : "LiveStream",
+      target: document.querySelector('#camera')
+    },
+    decoder : {
+      readers : ["code_128_reader"]
+    }
+    }, function(err) {
+      if (err) {
+          console.log(err);
+          return
+      }
+      console.log("Initialization finished. Ready to start");
+      Quagga.start();
+    });
+
+    //add
+    Quagga.onDetected(function(data) {
+        console.log(data);
+
+        document.querySelector('#result').innerHTML = data.codeResult.code;
+    });
+
+</script>
+
+{% endblock %}
