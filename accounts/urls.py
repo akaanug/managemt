@@ -70,6 +70,9 @@ urlpatterns = [
     path('reportPage/', views.report, name='report'),
     path('pdf_view/<str:date>', login_required(views.ViewPDF.as_view()), name="pdf_view"),
     path('pdf_download/<str:date>', login_required(views.DownloadPDF.as_view()), name="pdf_download"),
+
+    
+    path('view_barcode/', login_required(views.barcodeView), name="barcode_view"),
 ]
 
 #for images
