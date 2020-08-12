@@ -517,5 +517,43 @@ def history(request, pk):
 
 @login_required(login_url='login')
 def barcodeView(request):
-    context = {}
-    return render(request, 'accounts/readBarcode.html', context)
+    barcodeInstance = None
+    if request.method=="POST":
+        barcodeInstance = request.POST.get('barcode')
+        productSet = None
+
+        #get the product with scanned barcode
+        try:
+            productSet = Product.objects.filter(barcode=barcodeInstance)
+        except Exception as ex:
+            print(ex)
+
+        #if there is more than one product with given barcode
+        if productSet.count() > 1:
+            context = {'barcode': barcodeInstance, 'products': productSet}
+            return render(request, 'accounts/listProducts.html', context )
+
+        print(productSet)
+
+        #if there is only one product with scanned barcode
+        if productSet.count() == 1:
+            product = productSet[0]
+            pk = product.id
+            return productPage(request, pk)
+        else:
+            context = {'barcode':barcodeInstance}
+            return render(request, 'accounts/product404.html', context )
+
+    return render(request, 'accounts/readBarcode.html')
+
+
+
+#@login_required(login_url='login')
+def productPage(request, pk):
+    product = Product.objects.get(id=pk)
+    context = {'product': product}
+    return render( request, 'accounts/productPage.html', context )
+
+@login_required(login_url='login')
+def listProducts(request):
+    return render( request, 'accounts/listProducts.html' )

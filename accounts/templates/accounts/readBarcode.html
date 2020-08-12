@@ -4,7 +4,10 @@
 
 <script src="../static/js/quagga.js"> </script>
 
-<div id="result"></div>
+<form id="barcodeForm" action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" id="barcode" name="barcode">
+</form>
 
 <div id="camera"></div>
 
@@ -32,7 +35,11 @@
     Quagga.onDetected(function(data) {
         console.log(data);
 
-        document.querySelector('#result').innerHTML = data.codeResult.code;
+        //submit form when barcode is detected
+        document.getElementById('barcode').value = data.codeResult.code;
+        //alert(document.getElementById('barcode').value)
+        var form = document.getElementById("barcodeForm");
+        form.submit();
     });
 
 </script>
