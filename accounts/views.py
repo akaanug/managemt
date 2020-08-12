@@ -25,7 +25,7 @@ from simple_history.utils import update_change_reason
 
 import pytz
 
-#import cv2
+import cv2
 from pyzbar import pyzbar
 
 """
