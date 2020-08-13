@@ -1,0 +1,83 @@
+{%  extends 'accounts/main.html' %}
+
+{% block content %}
+
+<br>
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+			<h5>Ürün Sayfası:</h5>
+			<hr>
+			<a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'updateProduct' product.id %}">Ürünü Güncelle</a>
+			<a class="btn btn-outline-danger  btn-sm btn-block" href="{% url 'deleteProduct' product.id %}">Ürünü Sil</a>
+
+		</div>
+	</div>
+</div>
+
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+			<table class="table table-sm">
+				<tr>
+                    <th></th>
+                    <th>Ürün Adı</th>
+                    <th>Barkod</th>
+                    <th>Ürün Kodu</th>
+                    <th>Kritik Stok</th>
+                    <th>Kritik Stok Sayısı</th>
+                    <th>Satan Firma</th>
+                    <th>Alış Tarihi</th>
+                    <th>Kayıt Tarihi</th>
+                    <th>Ücret</th>
+                    <th>Adet</th>
+                    <th>Kategori</th>
+                    <th>Marka</th>
+                    <th>Model</th>
+                    <th>Açıklama</th>
+                    <th>Son Günc. Kullanıcı</th>
+				</tr>
+
+				<tr>
+                    <div class="col-sm-2 buttons-alignment">
+                        <td>
+                            {% if product.invoice is not Null %}
+                                <a class="btn btn-sm btn-info" href="{% url 'invoice-path' product.invoice.id %}">Faturayı Gör</a>
+                            {% else %}
+                                <a class="btn btn-sm btn-danger" href="{% url 'addInvoice' product.id %}">Fatura Ekle</a>
+                            {% endif %}
+
+                            {% if product.photo %}
+                               <a class="btn btn-sm btn-info" href="{{ product.photo.url }}">Fotoğrafı Gör</a>
+                            {% else %}
+                               <a class="btn btn-sm btn-danger" href="{% url 'updateProduct' product.id %}">Fotoğraf Ekle</a>
+                            {% endif %}
+
+                            <a class="btn btn-sm btn-info" href="{% url 'history-path' product.id %}">Geçmiş</a>
+                        </td>
+                    </div>
+					<td>{{ product.name}}</td>
+					<td>{{ product.barcode }}</td>
+					<td>{{ product.code }}</td>
+					<td>{{ product.criticalStock }}</td>
+					<td>{{ product.criticalStockAmt }}</td>
+                    <td>{{ product.vendor }}</td>
+                    <td>{{ product.dateBought }}</td>
+                    <td>{{ product.regDate }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.amount }}</td>
+                    <td>{{ product.category }}</td>
+                    <td>{{ product.brand }}</td>
+                    <td>{{ product.model }}</td>
+                    <td>{{ product.description }}</td>
+                    <td>{{ product.editor }}</td>
+				<tr>
+
+			</table>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

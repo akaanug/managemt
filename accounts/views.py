@@ -25,6 +25,7 @@ from simple_history.utils import update_change_reason
 
 import pytz
 
+
 """
 @unauthenticated_user
 def registerPage(request):
@@ -168,7 +169,6 @@ def getHistoryLabel(product):
         "invoice": "Fatura",
         "history": "Tarih",
     }
-
 
     histories = product.history.all()
 
@@ -495,7 +495,7 @@ class DownloadPDF(View):
         response['Content-Disposition'] = content
         return response
 
-@login_required
+@login_required(login_url='login')
 def report(request):
     current_date = dt.today().date()
     date = current_date
@@ -513,3 +513,111 @@ def history(request, pk):
     histories = product.history.all()
     context = {'histories': histories}
     return render( request, 'accounts/history.html', context )
+
+
+@login_required(login_url='login')
+def barcodeView(request):
+    barcodeInstance = None
+    if request.method=="POST":
+        barcodeInstance = request.POST.get('barcode')
+        productSet = None
+
+        #get the product with scanned barcode
+        try:
+            productSet = Product.objects.filter(barcode=barcodeInstance)
+        except Exception as ex:
+            print(ex)
+
+        #if there is more than one product with given barcode
+        if productSet.count() > 1:
+            context = {'barcode': barcodeInstance, 'products': productSet}
+            return render(request, 'accounts/listProducts.html', context )
+
+        #if there is only one product with scanned barcode
+        if productSet.count() == 1:
+            product = productSet[0]
+            pk = product.id
+            return productPage(request, pk)
+        else:
+            context = {'barcode':barcodeInstance}
+            return render(request, 'accounts/product404.html', context )
+
+    return render(request, 'accounts/readBarcode.html')
+
+
+
+@login_required(login_url='login')
+def productPage(request, pk):
+    product = Product.objects.get(id=pk)
+    context = {'product': product}
+    return render( request, 'accounts/productPage.html', context )
+
+@login_required(login_url='login')
+def listProducts(request):
+    return render( request, 'accounts/listProducts.html' )
+
+
+#prefill form with the information of the product which has the scanned barcode
+@login_required(login_url='login')
+def addProductFromBarcode(request):
+    barcodeInstance = None
+    if request.method=="POST":
+        barcodeInstance = request.POST.get('barcode')
+        product = None
+
+        #get the product with scanned barcode
+        try:
+            product = Product.objects.filter(barcode=barcodeInstance)[0]
+        except Exception as ex:
+            print(ex)
+            #if there is no product, give 404 error
+            context = {'barcode' : barcodeInstance}
+            return render(request, 'accounts/product404.html', context )
+
+        #insert barcode as parameter via the URL
+        return redirect( 'prefilledAddProduct/{}'.format(barcodeInstance) )
+
+    return render(request, 'accounts/readBarcode.html')
+
+
+#return prefilled product form
+@login_required(login_url='login')
+def prefilledAddProduct(request, pk):
+
+    barcodeInstance = pk
+    product = Product.objects.filter(barcode=barcodeInstance)[0]
+    productForm = ProductForm(initial={ 'editor': request.user.username,
+                                        'name': product.name,
+                                        'vendor': product.vendor,
+                                        'barcode': product.barcode,
+                                        'category': product.category,
+                                        'brand': product.brand,
+                                        'model': product.model,
+                                        'description': product.description,
+                                        'photo': product.photo,
+                                        'code': product.code })
+    invoiceForm = InvoiceForm()
+    if request.method == 'POST':
+        invoiceForm = InvoiceForm(request.POST)
+        productForm = ProductForm(request.POST, request.FILES)
+        if invoiceForm.is_valid() and productForm.is_valid() :
+            newProduct = productForm.save()
+            update_change_reason(newProduct, "Ürün eklendi.")
+            newInvoice = invoiceForm.save()
+
+            #fill invoice based on information in newProduct
+            sum = newProduct.price * newProduct.amount
+            newInvoice.sum = sum
+            newInvoice.vendor = newProduct.vendor
+            newInvoice.date = newProduct.dateBought
+            newInvoice.save()
+
+            #link invoice to product
+            newProduct.invoice = newInvoice
+            newProduct.save()
+            update_change_reason(newProduct, "Fatura eklendi.")
+
+            return redirect('/')
+
+    context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
+    return render(request, 'accounts/product-form.html', context)

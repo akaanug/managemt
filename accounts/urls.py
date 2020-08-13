@@ -31,6 +31,9 @@ urlpatterns = [
     path('user', views.userPage, name='user-page'),
     path('products/', views.products, name='products'),
     path('invoice/<str:pk>/', views.invoice, name='invoice-path'),
+    path('productPage/<str:pk>/', views.productPage, name='productPage'),
+
+    path('listProducts/', views.listProducts, name='listProducts'),
 
     path('history/<str:pk>/', views.history, name='history-path'),
 
@@ -70,6 +73,11 @@ urlpatterns = [
     path('reportPage/', views.report, name='report'),
     path('pdf_view/<str:date>', login_required(views.ViewPDF.as_view()), name="pdf_view"),
     path('pdf_download/<str:date>', login_required(views.DownloadPDF.as_view()), name="pdf_download"),
+
+
+    path('view_barcode/', views.barcodeView, name="barcode_view"),
+    path('addFromBarcode/', views.addProductFromBarcode, name="addProductFromBarcode"),
+    path('addFromBarcode/prefilledAddProduct/<str:pk>/', views.prefilledAddProduct, name="prefilledAddProduct"),
 ]
 
 #for images

@@ -1,0 +1,104 @@
+{%  extends 'accounts/main.html' %}
+
+{% block content %}
+
+<div class="card card-body">
+    <h5>{{barcode}} barkodlu ürünler:</h5>
+</div>
+
+<table id="products" class="table table-striped table-bordered" cellspacing="0" width="100%">
+  <thead>
+    <tr>
+      <th></th>
+      <th></th>
+      <th>Ürün Adı</th>
+      <th>Barkod</th>
+      <th>Ürün Kodu</th>
+      <th>Kayıt Tarihi</th>
+      <th>Fiyat</th>
+      <th>Adet</th>
+      <th>Kategori</th>
+      <th>Marka</th>
+      <th>Model</th>
+      <th>Açıklama</th>
+      <th>Son Günc. Kullanıcı</th>
+      <th></th>
+
+    </tr>
+  </thead>
+  <tbody>
+      {% for product in products %}
+          <tr>
+              <td></td>
+              <div class="col-sm-2 buttons-alignment">
+                  <td>
+                      {% if product.invoice is not Null %}
+                          <a class="btn btn-sm btn-info" href="{% url 'invoice-path' product.invoice.id %}">Faturayı Gör</a>
+                      {% else %}
+                          <a class="btn btn-sm btn-danger" href="{% url 'addInvoice' product.id %}">Fatura Ekle</a>
+                      {% endif %}
+
+                      {% if product.photo %}
+                         <a class="btn btn-sm btn-info" href="{{ product.photo.url }}">Fotoğrafı Gör</a>
+                      {% else %}
+                         <a class="btn btn-sm btn-danger" href="{% url 'updateProduct' product.id %}">Fotoğraf Ekle</a>
+                      {% endif %}
+
+                      <a class="btn btn-sm btn-info" href="{% url 'history-path' product.id %}">Geçmiş</a>
+                  </td>
+              </div>
+              <td>
+                  <a href="{% url 'productPage' product.id %}">{{ product.name }}</a>
+              </td>
+              <td>{{ product.barcode }}</td>
+              <td>{{ product.code }}</td>
+              <td>{{ product.regDate }}</td>
+              <td>{{ product.price }}</td>
+              <td>{{ product.amount }}</td>
+              <td>{{ product.category }}</td>
+              <td>{{ product.brand }}</td>
+              <td>{{ product.model }}</td>
+              <td>{{ product.description }}</td>
+              <td>{{ product.editor }}</td>
+              <td>
+                  <div class="col-sm-2 buttons-alignment">
+                      <a class="btn btn-sm btn-info" href="{% url 'updateProduct' product.id %}">Güncelle</a>
+                      <a class="btn btn-sm btn-danger" href="{% url 'deleteProduct' product.id %}">Sil</a>
+                  </div>
+              </td>
+          </tr>
+      {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr>
+      <th>
+      </th>
+      <th>
+      </th>
+      <th>Ürün Adı
+      </th>
+      <th>Barkod
+      </th>
+      <th>Ürün Kodu
+      </th>
+      <th>Kayıt Tarihi
+      </th>
+      <th>Fiyat
+      </th>
+      <th>Adet
+      </th>
+      <th>Kategori
+      </th>
+      <th>Marka
+      </th>
+      <th>Model
+      </th>
+      <th>Açıklama
+      </th>
+      <th>Son Günc. Kullanıcı
+      </th>
+    </tr>
+  </tfoot>
+</table>
+
+{% endblock %}

@@ -13,6 +13,8 @@
 		<div class="card card-body">
 			<div class="btn-group" role="group" aria-label="Basic example">
 				<a class="btn btn-primary" href="{% url 'addProduct' %}">Yeni Ürün Kaydet</a>
+				<a class="btn btn-warning" href="{% url 'barcode_view' %}">Barkod Okutarak Ara</a>
+				<a class="btn btn-success" href="{% url 'addProductFromBarcode' %}">Barkod Okutarak Yeni Ürün Kaydet</a>
 
 			</div>
 			<table class="table table-sm">
@@ -34,7 +36,9 @@
 						<td><a class="btn btn-sm btn-danger" href="{% url 'addInvoice' product.id %}">Fatura Ekle</a></td>
 					{% endif %}
 
-					<td>{{product.name}}</td>
+					<td>
+						<a href="{% url 'productPage' product.id %}">{{ product.name }}</a>
+					</td>
 					<td>{{product.barcode}}</td>
 					<td>{{product.dateBought}}</td>
 					<td>{{product.amount}}</td>
