@@ -75,7 +75,9 @@ urlpatterns = [
     path('pdf_download/<str:date>', login_required(views.DownloadPDF.as_view()), name="pdf_download"),
 
 
-    path('view_barcode/', login_required(views.barcodeView), name="barcode_view"),
+    path('view_barcode/', views.barcodeView, name="barcode_view"),
+    path('addFromBarcode/', views.addProductFromBarcode, name="addProductFromBarcode"),
+    path('addFromBarcode/prefilledAddProduct/<str:pk>/', views.prefilledAddProduct, name="prefilledAddProduct"),
 ]
 
 #for images
