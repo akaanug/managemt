@@ -78,6 +78,8 @@ urlpatterns = [
     path('view_barcode/', views.barcodeView, name="barcode_view"),
     path('addFromBarcode/', views.addProductFromBarcode, name="addProductFromBarcode"),
     path('addFromBarcode/prefilledAddProduct/<str:pk>/', views.prefilledAddProduct, name="prefilledAddProduct"),
+
+    path('stocktakePage/', views.stocktakePage, name="stocktakePage"),
 ]
 
 #for images

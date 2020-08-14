@@ -1,0 +1,16 @@
+{%  extends 'accounts/main.html' %}
+
+{% block content %}
+
+<h5>Sayım Sayfası:</h5>
+
+<div class="card card-body">
+
+    <a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'barcode_view' %}">Sayıma Ürün Ekle</a>
+    <a class="btn btn-outline-danger  btn-sm btn-block" href="{% url 'barcode_view' %}">Sayımdan Ürün Çıkar</a>
+
+</div>
+
+
+
+{% endblock %}

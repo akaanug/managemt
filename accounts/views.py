@@ -25,6 +25,15 @@ from simple_history.utils import update_change_reason
 
 import pytz
 
+#from django.core.mail import EmailMessage
+#from django.conf import settings
+#from django.template.loader import render_to_string
+
+
+#sends information email to admin every week that contains criticalProducts etc.
+#def sendInformationEmail(request):
+#    template = render_to_string('accounts/email_template.html', { 'products' : products })
+
 
 """
 @unauthenticated_user
@@ -621,3 +630,9 @@ def prefilledAddProduct(request, pk):
 
     context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
     return render(request, 'accounts/product-form.html', context)
+
+
+@login_required(login_url='login')
+def stocktakePage(request):
+    context = {}
+    return render(request, 'accounts/stocktakePage.html', context)

@@ -20,7 +20,7 @@
       target: document.querySelector('#camera')
     },
     decoder : {
-      readers : ["code_128_reader"]
+      readers : ["ean_reader"]
     }
     }, function(err) {
       if (err) {
@@ -40,6 +40,7 @@
         //alert(document.getElementById('barcode').value)
         var form = document.getElementById("barcodeForm");
         form.submit();
+        Quagga.stop();
     });
 
 </script>
