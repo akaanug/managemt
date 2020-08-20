@@ -25,6 +25,9 @@ from simple_history.utils import update_change_reason
 
 import pytz
 
+from bootstrap_modal_forms.generic import BSModalUpdateView
+from django.urls import reverse_lazy
+
 #from django.core.mail import EmailMessage
 #from django.conf import settings
 #from django.template.loader import render_to_string
@@ -109,12 +112,7 @@ def userPage(request):
 @login_required(login_url='login')
 def products(request):
     products = Product.objects.all()
-
-    myFilter = ProductFilter(request.GET, queryset=products)
-    products = myFilter.qs
-
-    context = {'products': products,
-    'myFilter': myFilter }
+    context = {'products': products }
 
     return render( request, 'accounts/products-new.html', context )
 
@@ -634,5 +632,51 @@ def prefilledAddProduct(request, pk):
 
 @login_required(login_url='login')
 def stocktakePage(request):
-    context = {}
+    stocktakeProducts = []
+    products = Product.objects.all()
+
+    productFilter = ProductFilter(request.GET, queryset=products)
+    products = productFilter.qs
+
+    context = { 'stocktakeProducts': stocktakeProducts, 'products': products,
+     'productFilter': productFilter, }
+
     return render(request, 'accounts/stocktakePage.html', context)
+
+@login_required(login_url='login')
+def productSTView(request, pk):
+    product = Product.objects.get(id=pk)
+    productForm = ProductSTForm(instance = product)
+    if request.method == 'POST':
+        productForm = ProductSTForm(request.POST, instance = product)
+        oldAmt = product.amount
+        if productForm.is_valid():
+            productForm.save()
+            newAmt = product.amount
+
+            loss = 0
+            if oldAmt <= newAmt:
+                loss = 0
+            else:
+                loss = (oldAmt - newAmt) * product.price
+
+            if loss == 0:
+                r = "Zarar Yok."
+            else:
+                r = str(oldAmt - newAmt) + " adet ürün eksik. Zarar = " + str(loss)
+
+            reason = "SAYIM: " + getHistoryLabel(product) + r
+            update_change_reason(product, reason )
+            return redirect('/stocktakePage/')
+    context = { 'form': productForm, }
+    return render(request, 'accounts/updateStocktakeProduct.html', context)
+
+
+'''
+class StocktakeProductView(BSModalUpdateView):
+    model = Product
+    template_name = 'accounts/updateStocktakeProduct.html'
+    form_class = StocktakeModelForm
+    success_message = 'Sayım Başarılı!'
+    success_url = reverse_lazy('stocktakePage')
+'''

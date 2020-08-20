@@ -5,6 +5,7 @@ from django.forms import DateInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+from bootstrap_modal_forms.forms import BSModalModelForm
 
 class CreateUserForm(UserCreationForm):
     class Meta:
@@ -60,3 +61,16 @@ class AccountForm(ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', ]
+
+class ProductSTForm(ModelForm):
+    class Meta:
+        model = Product
+        fields = ['amount',]
+
+
+'''
+class StocktakeModelForm(BSModalModelForm):
+    class Meta:
+        model = Product
+        fields = ['amount',]
+'''

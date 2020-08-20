@@ -45,6 +45,10 @@ INSTALLED_APPS = [
     'storages',
 
     'simple_history',
+
+    'bootstrap_modal_forms',
+
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

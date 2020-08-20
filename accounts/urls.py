@@ -28,8 +28,8 @@ urlpatterns = [
     path('login/', views.loginPage, name='login'),
     path('logout/', views.logoutUser, name='logout'),
     path('', views.home, name='home'),
-    path('user', views.userPage, name='user-page'),
     path('products/', views.products, name='products'),
+    path('user', views.userPage, name='user-page'),
     path('invoice/<str:pk>/', views.invoice, name='invoice-path'),
     path('productPage/<str:pk>/', views.productPage, name='productPage'),
 
@@ -80,6 +80,11 @@ urlpatterns = [
     path('addFromBarcode/prefilledAddProduct/<str:pk>/', views.prefilledAddProduct, name="prefilledAddProduct"),
 
     path('stocktakePage/', views.stocktakePage, name="stocktakePage"),
+
+    path('productST/<int:pk>', views.productSTView, name="productST")
+
+    #path('updateStocktakeProduct/<int:pk>', views.StocktakeProductView.as_view(), name='updateStocktakeProduct'),
+
 ]
 
 #for images

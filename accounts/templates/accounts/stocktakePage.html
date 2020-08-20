@@ -4,13 +4,176 @@
 
 <h5>Sayım Sayfası:</h5>
 
-<div class="card card-body">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
-    <a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'barcode_view' %}">Sayıma Ürün Ekle</a>
-    <a class="btn btn-outline-danger  btn-sm btn-block" href="{% url 'barcode_view' %}">Sayımdan Ürün Çıkar</a>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" ></script>
 
+<script src="../static/js/jquery.bootstrap.modal.forms.min.js"></script>
+<script src="../static/js/quagga.js"> </script>
+
+<!--
+<div class="modal fade" id="create-modal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog mt-5">
+    <div class="modal-content">
+    </div>
+  </div>
 </div>
 
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+  <div class="modal-dialog mt-5" role="document">
+    <div class="modal-content"></div>
+  </div>
+</div>
+-->
 
 
-{% endblock %}
+<form id="barcodeForm" action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" id="barcode" name="barcode">
+</form>
+
+<div id="camera"></div>
+
+<script>
+
+    Quagga.init({
+    inputStream : {
+      name : "Live",
+      type : "LiveStream",
+      target: document.querySelector('#camera')
+    },
+    decoder : {
+      readers : ["code_128_reader"]
+    }
+    }, function(err) {
+      if (err) {
+          console.log(err);
+          return
+      }
+      console.log("Initialization finished. Ready to start");
+      Quagga.start();
+    });
+
+    //add
+    Quagga.onDetected(function(data) {
+        console.log(data);
+
+        //submit form when barcode is detected
+
+        //fill search bar
+        document.getElementsByClassName('dataTables_filter')[0].getElementsByTagName('input')[0].value = data.codeResult.code;
+        console.log(document.getElementsByClassName('dataTables_filter')[0].getElementsByTagName('input')[0]);
+    });
+
+</script>
+
+
+<style>
+#product-pic{
+    object-fit: cover;
+}
+</style>
+
+<div class="row">
+    <div class="col-md">
+        <div class="card card-body">
+            <h5>Sayımı Yapılan Ürünler:</h5>
+            <table id="stocktakeProducts" class="table">
+                <tr>
+                    <th>Ürün Adı</th>
+                    <th>Barkod</th>
+                    <th>Adet</th>
+                </tr>
+
+                {% for product in stocktakeProducts %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.barcode }}</td>
+                        <td>{{ product.amount }}</td>
+                    </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div>
+</div>
+
+<br>
+
+<div class="card card-body">
+    <h5>Henüz Sayımı Yapılmamış Ürünler:</h5>
+    <!--
+    <form method = "get">
+        <b>Arama Filtreleri:</b>
+        {{productFilter.form.as_p}}
+        <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+    -->
+    {% include "accounts/products.html" %}
+</div>
+
+<script>
+
+$(document).ready(function() {
+    $('#products').DataTable();
+} );
+
+</script>
+
+{% endblock content %}
+
+<!--
+{% block extrascripts %}
+  <script type="text/javascript">
+      $(function () {
+
+          $(".update-product").each(function () {
+              console.log('clicked');
+            $(this).modalForm({
+              modalID: "#modal-crud",
+              formURL: $(this).data('id')
+            });
+          });
+
+          var asyncSuccessMessage = [
+            "<div ",
+            "style='position:fixed;top:0;z-index:10000;width:100%;border-radius:0;' ",
+            "class='alert alert-icon alert-success alert-dismissible fade show mb-0' role='alert'>",
+            "Success: Book was updated.",
+            "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>",
+            "<span aria-hidden='true'>&times;</span>",
+            "</button>",
+            "</div>",
+            "<script>",
+            "$('.alert').fadeTo(2000, 500).slideUp(500, function () {$('.alert').slideUp(500).remove();});",
+            "<\/script>"
+          ].join("");
+
+          function updateStocktake() {
+            $(".update-product").each(function () {
+              $(this).modalForm({
+                formURL: $(this).data("form-url"),
+                asyncUpdate: true,
+                asyncSettings: {
+                  closeOnSubmit: false,
+                  successMessage: asyncSuccessMessage,
+                  addModalFormFunction: updateStocktake
+                }
+              });
+            });
+          }
+          updateStocktake();
+
+          // The formURL is retrieved from the data of the element
+          $(".bs-modal").each(function () {
+              $(this).modalForm({formURL: $(this).data("form-url")});
+          });
+
+          // Hide message
+          $(".alert").fadeTo(2000, 500).slideUp(500, function () {
+              $(".alert").slideUp(500);
+          });
+      });
+  </script>
+{% endblock extrascripts %}
+-->
