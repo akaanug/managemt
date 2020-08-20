@@ -2,6 +2,16 @@
 {% load static %}
 {% block content %}
 
+<script type="text/javascript">
+  //if date form is empty, do not submit form
+  function validateForm() {
+    var a = document.forms["dateForm"]["date"].value;
+    if (!a) {
+      alert("Lütfen Bir Tarih Girin");
+      return false;
+    }
+  }
+</script>
 
 <div class="container">
 		<div class="row">
@@ -10,7 +20,7 @@
 			<div class="col-md">
 				<div class="card card-body">
 
-					<form id="dateForm" action="" method="post">
+					<form id="dateForm" onsubmit="return validateForm()" action="" method="post">
 						{% csrf_token %}
 						<label for="tarih">Tarihi gir:</label>
 						<input type="date" id="date" name="date" value="{{ date|date:"Y-m-d" }}">
