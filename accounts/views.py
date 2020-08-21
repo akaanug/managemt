@@ -695,7 +695,7 @@ def stocktakePage(request):
                     lastHistories.append( hist )
 
                     #get the number after character '=' which is the loss
-                    if '=' in lossStr:
+                    if '=' in s:
                         lossStr = s.split('=')[1]
                         lossStr = lossStr[:-4]
                         lossFloat = float(lossStr)
