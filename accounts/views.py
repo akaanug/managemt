@@ -683,7 +683,6 @@ def stocktakePage(request):
 
     #if there is not any product left that is not in stocktake
     if products.count() is 0:
-        #context = { 'stocktakeProducts': stocktakeProducts }
         lastHistories = []
 
         #find total loss and last histories that are
@@ -696,14 +695,16 @@ def stocktakePage(request):
                     lastHistories.append( hist )
 
                     #get the number after character '=' which is the loss
-                    lossStr = s.split('=')[1]
-                    lossStr = lossStr[:-4]
-                    lossFloat = float(lossStr)
-
-                    lossDict.update( {st.name:lossFloat} )
-
-                    totalLoss += lossFloat
+                    if '=' in lossStr:
+                        lossStr = s.split('=')[1]
+                        lossStr = lossStr[:-4]
+                        lossFloat = float(lossStr)
+                        lossDict.update( {st.name:lossFloat} )
+                        totalLoss += lossFloat
                     break
+
+
+
 
     productFilter = ProductFilter(request.GET, queryset=products)
     products = productFilter.qs
