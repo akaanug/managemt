@@ -146,6 +146,9 @@ def addProduct(request):
             newProduct.save()
             update_change_reason(newProduct, "Fatura eklendi.")
 
+            successMessage = str(newProduct.name) + " adlı ürün başarıyla eklendi."
+            messages.success(request, successMessage)
+
             return redirect('/')
 
     context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
@@ -219,7 +222,14 @@ def updateProduct(request, pk):
             productForm.save()
             update_change_reason(product, getHistoryLabel(product))
             invoiceForm.save()
-            return redirect('/')
+
+            successMessage = str(product.name) + " adlı ürün başarıyla güncellendi."
+            messages.success(request, successMessage)
+            return redirect('/products/')
+        else:
+            successMessage = str(product.name) + " adlı ürün güncellenemedi."
+            messages.warning(request, failedMessage)
+
 
     context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
     return render(request, 'accounts/product-form.html', context)
@@ -231,6 +241,10 @@ def deleteProduct(request, pk):
 
     if request.method == "POST":
         item.delete()
+
+        successMessage = str(item.name) + " adlı ürün başarıyla silindi."
+        messages.success(request, successMessage)
+
         return redirect('/')
 
     context = {'item': item}
@@ -691,7 +705,10 @@ def productSTView(request, pk):
 
             reason = "SAYIM: " + getHistoryLabel(product) + r
 
-            update_change_reason(product, reason )
+            update_change_reason(product, reason)
+
+            messages.success(request, 'Ürün Sayımı Başarılı!')
+
             return redirect('/stocktakePage/')
     context = { 'form': productForm, }
     return render(request, 'accounts/updateStocktakeProduct.html', context)

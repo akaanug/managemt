@@ -11,6 +11,47 @@
 </head>
 <body>
 	{%  include 'accounts/navbar.html' %}
+
+	<!-- Messages -->
+	{% if messages %}
+		<ul class="messages">
+		    {% for message in messages %}
+			    <li  {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %}>{{ message }}</li>
+		    {% endfor %}
+		</ul>
+	{% endif %}
+
+	<style>
+
+	    .alert {
+	        positition: relative;
+	        opacity: 1;
+	        visibility: visible;
+	        transform: translateX(0px);
+	        transition: visibility 0s, opacity 250ms, transform 250ms;
+	    }
+	    .alert.hide {
+	        positition: relative;
+	        opacity: 0;
+	        visibility: hidden;
+	        transform: translateX(-10px); // translateX, translateY, translateZ works well
+	        transition: visibility 0s 250ms, opacity 250ms, transform 250ms;
+	    }
+
+	</style>
+
+	<script>
+	var m = document.getElementsByClassName("alert");  // Return an array
+
+	setTimeout(function(){
+	   if (m && m.length) {
+	       m[0].classList.add('hide');
+	   }
+	}, 3000);
+	</script>
+
+
+
 	<div class="container-fluid">
 	{% block content %}
 
