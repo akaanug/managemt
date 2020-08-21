@@ -129,7 +129,7 @@ def addProduct(request):
     if request.method == 'POST':
         invoiceForm = InvoiceForm(request.POST)
         productForm = ProductForm(request.POST, request.FILES)
-        if invoiceForm.is_valid() and productForm.is_valid() :
+        if invoiceForm.is_valid() and productForm.is_valid():
             newProduct = productForm.save()
             update_change_reason(newProduct, "Ürün eklendi.")
             newInvoice = invoiceForm.save()
@@ -148,8 +148,10 @@ def addProduct(request):
 
             successMessage = str(newProduct.name) + " adlı ürün başarıyla eklendi."
             messages.success(request, successMessage)
-
             return redirect('/')
+        else:
+            message = "Ürün eklenemedi."
+            messages.warning(request, message)
 
     context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
     return render(request, 'accounts/product-form.html', context)
@@ -649,7 +651,12 @@ def prefilledAddProduct(request, pk):
             newProduct.save()
             update_change_reason(newProduct, "Fatura eklendi.")
 
+            message = str(newProduct.name) + " adlı ürün başarıyla eklendi."
+            messages.success(request, message)
             return redirect('/')
+        else:
+            message = str(product.name) + " adlı ürün eklenemedi."
+            messages.warning(request, message)
 
     context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
     return render(request, 'accounts/product-form.html', context)
@@ -707,9 +714,13 @@ def productSTView(request, pk):
 
             update_change_reason(product, reason)
 
-            messages.success(request, 'Ürün Sayımı Başarılı!')
-
+            message = str(product.name) + " adlı ürünün sayımı başarılı."
+            messages.success(request, message)
             return redirect('/stocktakePage/')
+        else:
+            message = str(product.name) + " adlı ürünün sayımı başarısız."
+            messages.warning(request, message)
+
     context = { 'form': productForm, }
     return render(request, 'accounts/updateStocktakeProduct.html', context)
 
