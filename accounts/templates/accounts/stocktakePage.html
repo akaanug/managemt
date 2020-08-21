@@ -86,42 +86,70 @@
         <button class="btn btn-primary" type="submit">Search</button>
     </form>
     -->
-    {% include "accounts/products.html" %}
+    {% if products|length is 0 %}
+        <script>
+            alert("Sayım Tamamlanmış Durumda.");
+        </script>
+        <h5 id="red">Sayım yapılmayan ürün kalmadı. Sayım tamamlandı. Toplam Zarar: {{totalLoss}} TL</h5>
+
+        <div>
+            <p>Zararın özeti:</p>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Ürün</th>
+                        <th scope="col">Zarar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, value in lossDict.items %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    {% else %}
+        {% include "accounts/products.html" %}
+    {% endif %}
 </div>
 
 <br>
 
 <div class="card card-body" id="stockTaken">
-    <h5>Sayımı Yapılan Ürünler:</h5>
-    <table id="stocktakeProducts" class="table table-striped table-bordered" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-                <th>Ürün Adı</th>
-                <th>Barkod</th>
-                <th>Adet</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for product in stocktakeProducts %}
+        <h5>Sayımı Yapılan Ürünler:</h5>
+        <table id="stocktakeProducts" class="table table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
                 <tr>
-                    <td>
-                        <a href="{% url 'productPage' product.id %}">{{ product.name }}</a>
-                    </td>
-                    <td>{{ product.barcode }}</td>
-                    <td>{{ product.amount }}</td>
+                    <th>Ürün Adı</th>
+                    <th>Barkod</th>
+                    <th>Adet</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-      	<tr>
-      		<th>Ürün Adı</th>
-      		<th>Barkod</th>
-      		<th>Adet</th>
-      	</tr>
-        </tfoot>
+            </thead>
 
-    </table>
+            <tbody>
+                {% for product in stocktakeProducts %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'productPage' product.id %}">{{ product.name }}</a>
+                        </td>
+                        <td>{{ product.barcode }}</td>
+                        <td>{{ product.amount }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+          	<tr>
+          		<th>Ürün Adı</th>
+          		<th>Barkod</th>
+          		<th>Adet</th>
+          	</tr>
+            </tfoot>
+
+        </table>
 </div>
 
 <br>

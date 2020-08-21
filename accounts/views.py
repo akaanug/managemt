@@ -678,11 +678,38 @@ def stocktakePage(request):
     lteToday = Product.objects.filter(lastStocktakeTime__lte=beginningOfTheDay)
     products = nullST | lteToday
 
+    totalLoss = 0
+    lossDict = {}
+
+    #if there is not any product left that is not in stocktake
+    if products.count() is 0:
+        #context = { 'stocktakeProducts': stocktakeProducts }
+        lastHistories = []
+
+        #find total loss and last histories that are
+        #genereated from stocktake page
+        for st in stocktakeProducts:
+            history = st.history.all()
+            for hist in history:
+                s = hist.history_change_reason
+                if s != None and s != "" and s[0] == '*':
+                    lastHistories.append( hist )
+
+                    #get the number after character '=' which is the loss
+                    lossStr = s.split('=')[1]
+                    lossStr = lossStr[:-4]
+                    lossFloat = float(lossStr)
+
+                    lossDict.update( {st.name:lossFloat} )
+
+                    totalLoss += lossFloat
+                    break
+
     productFilter = ProductFilter(request.GET, queryset=products)
     products = productFilter.qs
 
     context = { 'stocktakeProducts': stocktakeProducts, 'products': products,
-     'productFilter': productFilter, }
+     'productFilter': productFilter, 'totalLoss': totalLoss, 'lossDict': lossDict }
 
     return render(request, 'accounts/stocktakePage.html', context)
 
@@ -710,7 +737,7 @@ def productSTView(request, pk):
             else:
                 r = str(oldAmt - newAmt) + " adet ürün eksik. Zarar = " + str(loss) + " TL."
 
-            reason = "SAYIM: " + getHistoryLabel(product) + r
+            reason = "*SAYIM: " + getHistoryLabel(product) + r
 
             update_change_reason(product, reason)
 
