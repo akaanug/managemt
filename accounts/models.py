@@ -25,6 +25,7 @@ class Product(models.Model):
     history = HistoricalRecords(
         history_change_reason_field=models.TextField(null=True, max_length=255)
     )
+    lastStocktakeTime = models.DateTimeField(blank=True, null=True) #son sayım yapılan tarih
 
     def __str__(self):
         return f"{self.name} {self.barcode} {self.code}"

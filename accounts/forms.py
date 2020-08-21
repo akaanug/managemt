@@ -22,6 +22,7 @@ class ProductForm(ModelForm):
             'name' : forms.TextInput(attrs={'placeholder': 'Ürün adını gir', }),
             'dateBought': DateInput(attrs={'type': 'date', }),
             'editor': forms.HiddenInput(),
+            'lastStocktakeTime': forms.HiddenInput(),
         }
 
         labels = {
@@ -60,12 +61,19 @@ class InvoiceForm(ModelForm):
 class AccountForm(ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email', ]
+        fields = [ 'username', 'email', ]
 
 class ProductSTForm(ModelForm):
     class Meta:
         model = Product
-        fields = ['amount',]
+        fields = ['amount', 'lastStocktakeTime']
+
+        widgets = {'lastStocktakeTime': forms.HiddenInput(),}
+
+        labels = {
+            'amount' : 'Adet',
+            'lastStocktakeTime' : '',
+        }
 
 
 '''

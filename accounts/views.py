@@ -124,7 +124,7 @@ def invoice(request, pk):
 
 @login_required(login_url='login')
 def addProduct(request):
-    productForm = ProductForm(initial={ 'editor':request.user.username })
+    productForm = ProductForm(initial={ 'editor':request.user.username, })
     invoiceForm = InvoiceForm()
     if request.method == 'POST':
         invoiceForm = InvoiceForm(request.POST)
@@ -175,6 +175,7 @@ def getHistoryLabel(product):
         "dateBought": "Alış Tarihi",
         "invoice": "Fatura",
         "history": "Tarih",
+        "lastStocktakeTime": "Son Sayım Tarihi",
     }
 
     histories = product.history.all()
@@ -188,8 +189,18 @@ def getHistoryLabel(product):
 
     s = ""
     for change in delta.changes:
-        s += ("{}, {} iken {} olarak değiştirildi. ".format(translateDict[change.field],
-         change.old, change.new))
+        if change.field == "lastStocktakeTime":
+            oldTime = change.old
+            if oldTime is None:
+                oldTime = "Hiç"
+            else:
+                oldTime = change.old.strftime("%Y-%m-%d %H:%M")
+            newTime = change.new.strftime("%Y-%m-%d %H:%M")
+            s += ("{}, {} iken {} olarak değiştirildi. ".format(translateDict[change.field],
+            oldTime, newTime))
+        else:
+            s += ("{}, {} iken {} olarak değiştirildi. ".format(translateDict[change.field],
+            change.old, change.new))
 
     return s
 
@@ -632,8 +643,19 @@ def prefilledAddProduct(request, pk):
 
 @login_required(login_url='login')
 def stocktakePage(request):
-    stocktakeProducts = []
-    products = Product.objects.all()
+    dateObj = timezone.now()
+    time = datetime.time(0,0,0)
+    beginningOfTheDay = dt.combine(dateObj, time)
+
+    stocktakeProducts = Product.objects.filter(
+        lastStocktakeTime__isnull=False
+    ).filter(
+        lastStocktakeTime__gt=beginningOfTheDay
+    )
+
+    nullST = Product.objects.filter(lastStocktakeTime__isnull=True)
+    lteToday = Product.objects.filter(lastStocktakeTime__lte=beginningOfTheDay)
+    products = nullST | lteToday
 
     productFilter = ProductFilter(request.GET, queryset=products)
     products = productFilter.qs
@@ -646,7 +668,8 @@ def stocktakePage(request):
 @login_required(login_url='login')
 def productSTView(request, pk):
     product = Product.objects.get(id=pk)
-    productForm = ProductSTForm(instance = product)
+    productForm = ProductSTForm(initial={'lastStocktakeTime': timezone.now()},
+     instance = product )
     if request.method == 'POST':
         productForm = ProductSTForm(request.POST, instance = product)
         oldAmt = product.amount
@@ -654,6 +677,7 @@ def productSTView(request, pk):
             productForm.save()
             newAmt = product.amount
 
+            #find loss if any
             loss = 0
             if oldAmt <= newAmt:
                 loss = 0
@@ -663,9 +687,10 @@ def productSTView(request, pk):
             if loss == 0:
                 r = "Zarar Yok."
             else:
-                r = str(oldAmt - newAmt) + " adet ürün eksik. Zarar = " + str(loss)
+                r = str(oldAmt - newAmt) + " adet ürün eksik. Zarar = " + str(loss) + " TL."
 
             reason = "SAYIM: " + getHistoryLabel(product) + r
+
             update_change_reason(product, reason )
             return redirect('/stocktakePage/')
     context = { 'form': productForm, }
