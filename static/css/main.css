@@ -7,15 +7,18 @@
     }
 
 
-    #total-orders{
+    #notInStock{
         background-color: #4cb4c7;
     }
 
-
-    #orders-delivered{
-        background-color: #7abecc;
+    #stockNotTaken{
+        background-color: #7CD1C0;
     }
 
-    #orders-pending{
+    #stockTaken{
+        background-color: #fffc61;
+    }
+
+    #criticalTable{
         background-color: #7CD1C0;
     }
