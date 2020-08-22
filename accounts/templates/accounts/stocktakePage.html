@@ -39,6 +39,8 @@
 
 <script>
 
+    var _scannerIsRunning = false;
+
     Quagga.init({
     inputStream : {
       name : "Live",
@@ -55,13 +57,13 @@
       }
       console.log("Initialization finished. Ready to start");
       Quagga.start();
+
+      _scannerIsRunning = true;
     });
 
-    //add
+
     Quagga.onDetected(function(data) {
         console.log(data);
-
-        //submit form when barcode is detected
 
         //fill search bar
         document.getElementsByClassName('dataTables_filter')[0].getElementsByTagName('input')[0].value = data.codeResult.code;
@@ -72,10 +74,12 @@
 
 
 <style>
-#product-pic{
-    object-fit: cover;
-}
+    #product-pic{
+        object-fit: cover;
+    }
 </style>
+
+<p id="length" style="visibility: hidden;">{{ products|length }}</p>
 
 <div class="card card-body" id="stockNotTaken">
     <h5>Henüz Sayımı Yapılmamış Ürünler:</h5>
@@ -90,6 +94,7 @@
         <script>
             alert("Sayım Tamamlanmış Durumda.");
         </script>
+
         <h5 id="red">Sayım yapılmayan ürün kalmadı. Sayım tamamlandı. Toplam Zarar: {{totalLoss}} TL</h5>
 
         <div>
@@ -116,6 +121,28 @@
         {% include "accounts/products.html" %}
     {% endif %}
 </div>
+
+
+<script>
+
+    //close Quagga when the conditions met
+    function checkFlag() {
+        if( (document.getElementById("length").innerHTML == 0) &&
+            (_scannerIsRunning == true) ) {
+           Quagga.stop();
+           _scannerIsRunning = false;
+
+           //remove camera element
+           var element = document.getElementById("camera");
+           element.parentNode.removeChild(element);
+        } else {
+            /* do something*/
+            window.setTimeout(checkFlag, 1000); /* this checks the flag every 100 milliseconds*/
+        }
+    }
+    checkFlag();
+
+</script>
 
 <br>
 
@@ -157,13 +184,13 @@
 
 <script>
 
-$(document).ready(function() {
-    $('#products').DataTable();
-} );
+    $(document).ready(function() {
+        $('#products').DataTable();
+    } );
 
-$(document).ready(function() {
-    $('#stocktakeProducts').DataTable();
-} );
+    $(document).ready(function() {
+        $('#stocktakeProducts').DataTable();
+    } );
 
 </script>
 
