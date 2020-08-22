@@ -709,6 +709,9 @@ def stocktakePage(request):
     productFilter = ProductFilter(request.GET, queryset=products)
     products = productFilter.qs
 
+    message = "Sayım sayfası her günün başında yenilenir. " + "Sayım tamamlandığında kayıp ürünlerin özetini ve toplam zararı görebilirsiniz."
+    messages.info(request, message)
+
     context = { 'stocktakeProducts': stocktakeProducts, 'products': products,
      'productFilter': productFilter, 'totalLoss': totalLoss, 'lossDict': lossDict }
 
