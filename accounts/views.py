@@ -28,14 +28,9 @@ import pytz
 from bootstrap_modal_forms.generic import BSModalUpdateView
 from django.urls import reverse_lazy
 
-#from django.core.mail import EmailMessage
-#from django.conf import settings
-#from django.template.loader import render_to_string
-
-
-#sends information email to admin every week that contains criticalProducts etc.
-#def sendInformationEmail(request):
-#    template = render_to_string('accounts/email_template.html', { 'products' : products })
+from django.core.mail import EmailMessage
+from django.conf import settings
+from django.template.loader import render_to_string
 
 
 """
@@ -459,6 +454,9 @@ class ViewPDF(View):
 #Automaticly downloads to PDF file
 class DownloadPDF(View):
     def get(self, request, *args, **kwargs):
+
+        if not request.user.is_authenticated:
+            return render( 'home' )
 
         #pass date parameter as string and convert it back to datetime.datetime
         utc = pytz.UTC

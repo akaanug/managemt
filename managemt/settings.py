@@ -49,7 +49,16 @@ INSTALLED_APPS = [
     'bootstrap_modal_forms',
 
     'widget_tweaks',
+
+    'django_q',
 ]
+
+# Configure your Q cluster
+# More details https://django-q.readthedocs.io/en/latest/configure.html
+Q_CLUSTER = {
+    "name": "emailScheduler",
+    "orm": "default",  # Use Django's ORM + database for broker
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
