@@ -53,11 +53,13 @@ INSTALLED_APPS = [
     'django_q',
 ]
 
+REDISURL = os.environ['REDISURL']
+
 # Configure your Q cluster
 # More details https://django-q.readthedocs.io/en/latest/configure.html
 Q_CLUSTER = {
     "name": "emailScheduler",
-    "orm": "default",  # Use Django's ORM + database for broker
+    'redis': REDISURL
 }
 
 MIDDLEWARE = [
