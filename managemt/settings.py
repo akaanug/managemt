@@ -195,7 +195,7 @@ EMAIL_HOST_PASSWORD = gmail_pw
 
 
 #S3 BUCKETS CONFIG
-'''
+
 aws_secret = os.environ['AWS_SECRET']
 aws_bucket_name = os.environ['AWS_BUCKET']
 aws_id = os.environ['AWS_ID']
@@ -207,7 +207,7 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-'''
+
 
 '''
 <?xml version="1.0" encoding="UTF-8"?>
