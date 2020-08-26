@@ -38,6 +38,9 @@
 			  		<h5 class="card-title">Kritik Ürünler</h5>
 			  	</div>
 			  	<div class="card-body">
+					{% if criticalProducts|length == 0 %}
+					<p>Kritik ürün yok.</p>
+					{% else %}
 			    	<table class="card-table table">
 						<tr>
 							<th>Ürün</th>
@@ -55,6 +58,7 @@
 						</tr>
 						{% endfor %}
 					</table>
+					{% endif %}
 			  	</div>
 			</div>
 		</div>

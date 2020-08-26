@@ -59,6 +59,7 @@ REDISURL = os.environ['REDISURL']
 # More details https://django-q.readthedocs.io/en/latest/configure.html
 Q_CLUSTER = {
     "name": "emailScheduler",
+    #"orm": "default",  # Use Django's ORM + database for broker (this is for trying Django Q locally)
     'redis': REDISURL
 }
 

@@ -37,6 +37,10 @@
     </div>
 
     <!-- HTML Content -->
+    <h3>Seçilen Günde Stoktaki Ürünler:</h3>
+    {% if products|length == 0 %}
+        <p>Girilen tarihte stokta kayıtlı ürün bulunmamakta.</p>
+    {% else %}
     <table class="table">
         <tr>
             <th align="left">Ürün Adı</th>
@@ -64,15 +68,18 @@
                 <td>{{ product.model }}</td>
             </tr>
         {% endfor %}
-
     </table>
 
     <hr>
     <p><strong>Toplam: {{sum}} TL</strong></p>
+    {% endif %}
 
     <br><br><br>
 
     <h3>Seçilen Günde Yapılan İşlemler:</h3>
+    {% if allHistories|length == 0 %}
+        <p>Girilen tarihte işlem yapılmamıştır.</p>
+    {% else %}
     <table class="table">
         <tr>
             <th align="left">Ürün Adı</th>
@@ -89,8 +96,9 @@
                 <td>{{ history.history_change_reason }}</td>
             </tr>
         {% endfor %}
-
     </table>
+
+    {% endif %}
 
 
     <hr>
