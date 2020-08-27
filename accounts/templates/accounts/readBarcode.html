@@ -25,7 +25,25 @@
     }, function(err) {
       if (err) {
           console.log(err);
-          return
+          err = err.toString();
+
+          if (err.search("NotFoundError")) {
+              // No camera found. The user is probably in an office environment.
+              // Redirect to previous orders or show a background image of sorts.
+              error = "Kamera Bulunamadı.";
+              alert(error);
+
+            } else if (err.search("NotAllowedError")) {
+                // The user has blocked the permission request.
+                // We should ask them again just to be sure or redirect them.
+                error = "Kullanıcı kamera izin talebini engelledi. Bu özelliği kullanabilmek için kameraya izin verin.";
+                alert(error);
+            } else {
+                // Some other error.
+                alert(error);
+            }
+
+            return;
       }
       console.log("Initialization finished. Ready to start");
       Quagga.start();
