@@ -25,17 +25,43 @@
 -->
 
 
-<div class="card card-body">
+<div class="card card-body" id="ccColor">
+
     <h5>Sayım Sayfası:</h5>
+    <div id="cameraContainer">
 
+        <form id="barcodeForm" action="" method="post">
+            {% csrf_token %}
+            <input type="hidden" id="barcode" name="barcode">
+        </form>
 
-    <form id="barcodeForm" action="" method="post">
-        {% csrf_token %}
-        <input type="hidden" id="barcode" name="barcode">
-    </form>
-
-    <div id="camera"></div>
+        <div id="camera"></div>
+    </div>
 </div>
+
+<style>
+
+    #ccColor {
+        background-color: #aff7fe;
+    }
+
+    #camera video {
+        /* Make video to at least 100% wide and tall */
+        min-width: 50%;
+        min-height: 50%;
+
+        /* Setting width & height to auto prevents the browser from stretching or squishing the video */
+        width: auto;
+        height: auto;
+
+        /* Center the video */
+        position: absolute;
+        top: 53%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+    }
+
+</style>
 
 <script>
 
@@ -66,8 +92,17 @@
         console.log(data);
 
         //fill search bar
-        document.getElementsByClassName('dataTables_filter')[0].getElementsByTagName('input')[0].value = data.codeResult.code;
-        console.log(document.getElementsByClassName('dataTables_filter')[0].getElementsByTagName('input')[0]);
+        element = document.getElementsByClassName('dataTables_filter')[0].getElementsByTagName('input')[0];
+
+        element.value = data.codeResult.code;
+
+        //to trigger the search, activate keyup event
+        var e = jQuery.Event("keyup");
+        e.which = 39; // # Some key code value
+        e.keyCode = 39;
+
+        $('.dataTables_filter').find(':input').trigger(e);
+
     });
 
 </script>
@@ -78,6 +113,7 @@
         object-fit: cover;
     }
 </style>
+
 
 <p id="length" style="visibility: hidden;">{{ products|length }}</p>
 
