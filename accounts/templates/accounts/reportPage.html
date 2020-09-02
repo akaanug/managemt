@@ -11,33 +11,72 @@
       return false;
     }
   }
+
+  //if date form is empty, do not submit form
+  function validateForm2() {
+    var a = document.forms["dateForm2"]["date"].value;
+    if (!a) {
+      alert("Lütfen Bir Tarih Girin");
+      return false;
+    }
+  }
+
+  //if date form is empty, do not submit form
+  function validateForm3() {
+    var a = document.forms["dateForm3"]["date"].value;
+    if (!a) {
+      alert("Lütfen Bir Tarih Girin");
+      return false;
+    }
+  }
 </script>
 
-<div class="container">
-		<div class="row">
-			<div class="col-md"></div>
 
-			<div class="col-md">
-				<div class="card card-body">
+			<div class="card mb-3">
+				<div class="card card-body" style="margin:0 auto">
 
 					<form id="dateForm" onsubmit="return validateForm()" action="" method="post">
 						{% csrf_token %}
 						<label for="tarih">Tarihi gir:</label>
-						<input type="date" id="date" name="date" value="{{ date|date:"Y-m-d" }}">
+						<input type="date" id="date" name="date1" value="{{ date1|date:"Y-m-d" }}">
 						<input type="submit" value="Seç">
 					</form>
 
 					 <div class="text-center">
-						<p>Seçilen tarih: {{date}}</p>
+						<p>Seçilen tarih: {{ date1 }}</p>
 						<h3>Girilen tarihteki güncel raporu göster ya da indir.</h3>
-						<a class="btn btn-info" href="{% url 'pdf_view' date %}" target="_blank">Raporu Göster</a>
-						<a class="btn btn-info"  href="{% url 'pdf_download' date %}">Raporu İndir</a>
+						<a class="btn btn-info" href="{% url 'pdf_view' date1 %}" target="_blank">Raporu Göster</a>
+						<a class="btn btn-info"  href="{% url 'pdf_download' date1 %}">Raporu İndir</a>
 					</div>
 				</div>
 			</div>
 
-			<div class="col-md"></div>
-		</div>
-	</div>
+
+			<div class="card mb-3">
+				<div class="card card-body" style="margin:0 auto">
+
+					<form id="dateForm2" onsubmit="return validateForm2()" action="" method="post">
+						{% csrf_token %}
+						<label for="tarih"><:</label>
+						<input type="date" id="date" name="date1" value="{{ date1|date:"Y-m-d" }}">
+						<input type="submit" value="Seç">
+					</form>
+
+                    <form id="dateForm3" onsubmit="return validateForm3()" action="" method="post">
+						{% csrf_token %}
+						<label for="tarih">>:</label>
+						<input type="date" id="date" name="date2" value="{{ date2|date:"Y-m-d" }}">
+						<input type="submit" value="Seç">
+					</form>
+
+					 <div class="text-center">
+						<p>{{ date1 }} < Seçilen Aralık < {{ date2 }} </p>
+						<h3>Seçilen aralıktaki giriş/çıkışları göster ya da indir.</h3>
+						<a class="btn btn-primary" href="{% url 'pdf_log_view' date1 date2 %}" target="_blank">Raporu Göster</a>
+						<a class="btn btn-primary"  href="{% url 'pdf_log_download' date1 date2 %}">Raporu İndir</a>
+					</div>
+				</div>
+			</div>
+
 
 {% endblock %}

@@ -115,7 +115,7 @@
 </style>
 
 
-<p id="length" style="visibility: hidden;">{{ products|length }}</p>
+<p id="length" style="visibility: hidden;">{{ logs|length }}</p>
 
 <div class="card card-body" id="stockNotTaken">
     <h5>Henüz Sayımı Yapılmamış Ürünler:</h5>
@@ -126,7 +126,7 @@
         <button class="btn btn-primary" type="submit">Search</button>
     </form>
     -->
-    {% if products|length is 0 %}
+    {% if logs|length is 0 %}
         <script>
             alert("Sayım Tamamlanmış Durumda.");
         </script>
@@ -194,13 +194,11 @@
             </thead>
 
             <tbody>
-                {% for product in stocktakeProducts %}
+                {% for log in stocktakeProducts %}
                     <tr>
-                        <td>
-                            <a href="{% url 'productPage' product.id %}">{{ product.name }}</a>
-                        </td>
-                        <td>{{ product.barcode }}</td>
-                        <td>{{ product.amount }}</td>
+                        <td>{{ log.product.name }}</td>
+                        <td>{{ log.barcode }}</td>
+                        <td>{{ log.productsLeft }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -208,7 +206,7 @@
           	<tr>
           		<th>Ürün Adı</th>
           		<th>Barkod</th>
-          		<th>Adet</th>
+          		<th>Kalan Adet</th>
           	</tr>
             </tfoot>
 

@@ -1,4 +1,4 @@
-<table id="products" class="table table-striped table-bordered" cellspacing="0" width="100%">
+<table id="logs" class="table table-striped table-bordered" cellspacing="0" width="100%">
   <thead>
 	<tr>
 	  <th>Ürün Adı</th>
@@ -8,15 +8,14 @@
 	</tr>
   </thead>
   <tbody>
-	  {% for product in products %}
+	  {% for log in logs %}
 		  <tr>
+			  <td>{{ log.product }}</td>
+			  <td>{{ log.barcode }}</td>
+			  <td>{{ log.logDate }}</td>
+              <td>{{ log.productsLeft }}</td>
 			  <td>
-				  <a href="{% url 'productPage' product.id %}">{{ product.name }}</a>
-			  </td>
-			  <td>{{ product.barcode }}</td>
-			  <td>{{ product.amount }}</td>
-			  <td>
-				  <a class="btn btn-sm btn-info" href="{% url 'productST' product.id %}">Sayıma Ekle</a>
+				  <a class="btn btn-sm btn-info" href="{% url 'productST' log.id %}">Sayıma Ekle</a>
 			  </td>
 		  </tr>
 	  {% endfor %}
@@ -25,7 +24,8 @@
 	<tr>
 		<th>Ürün Adı</th>
 		<th>Barkod</th>
-		<th>Adet</th>
+		<th>Giriş Tarihi</th>
+        <th>Kalan Ürün Sayısı</th>
 	</tr>
   </tfoot>
 </table>

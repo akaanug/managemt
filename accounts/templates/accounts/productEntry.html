@@ -1,0 +1,146 @@
+{% extends 'accounts/main.html' %}
+{% load static %}
+{% block content %}
+
+<!--  for autocomplete function  -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    //all autocomplete functions:
+    $(function () {
+        $("#id_name").autocomplete({
+            source: '{% url 'autocompleteName' %}',
+            //minLength: 2
+        });
+    });
+
+    $(function () {
+        $("#id_vendor").autocomplete({
+            source: '{% url 'autocompleteVendor' %}',
+            //minLength: 2
+        });
+    });
+
+    $(function () {
+        $("#id_category").autocomplete({
+            source: '{% url 'autocompleteCategory' %}',
+            //minLength: 2
+        });
+    });
+
+    $(function () {
+        $("#id_model").autocomplete({
+            source: '{% url 'autocompleteModel' %}',
+            //minLength: 2
+        });
+    });
+
+    $(function () {
+        $("#id_brand").autocomplete({
+            source: '{% url 'autocompleteBrand' %}',
+            //minLength: 2
+        });
+    });
+
+
+    //check if price input is empty
+    function required() {
+        amount = parseInt(document.getElementById("id_amount").value);
+        productAmount = parseInt("{{ product.amount }}");
+        var type = "{{ type }}";
+
+        if( type == "True" ) {
+            type = true;
+        } else {
+            type = false;
+        }
+
+        if( type ){
+            if( document.getElementById("id_price") != null && document.getElementById("id_price").value == "" ) {
+                alert("Fiyatı girin");
+                return false;
+            }
+        } else if( amount > productAmount ) {
+            alert("Stokta " + amount + " Kadar Ürün Yok");
+            return false;
+        }
+    }
+
+</script>
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+            {% if type is True %}
+                <h5>{{ product.name }} Ürününe Giriş Yap:</h5>
+            {% else %}
+                <h5>{{ product.name }} Ürününden Çıkış Yap:</h5>
+            {% endif %}
+
+            <table>
+                <form action="" method="POST" enctype="multipart/form-data" onsubmit="return required()">
+                    <div class="form-group">
+                        {% csrf_token %}
+
+                        {% for field in logForm %}
+                            {% if type is False and field.name == "price" %}
+                            {% else %}
+                            <tr>
+                                <th>
+                                    {% if field.name == "company" and type is False %}
+                                        Ürünün verildiği firma:
+                                    {% elif field.name == "company" and type is True %}
+                                        Satın Alınan Firma:
+                                    {% else %}
+                                        {{ field.label }}:
+                                    {% endif %}
+                                </th>
+                                <td>
+                                    {{ field }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+
+
+                        <tbody>
+                            <tr>
+                                <th>
+                                    {{ invoiceForm.invoiceCode.label }}:
+                                </th>
+                                <td>
+                                    {{ invoiceForm.invoiceCode }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>
+                                    {{ invoiceForm.taxNo.label }}:
+                                </th>
+                                <td>
+                                    {{ invoiceForm.taxNo }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>
+                                    {{ invoiceForm.file.label }}:
+                                </th>
+                                <td>
+                                    {{ invoiceForm.file }}
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </div>
+
+                    <input type="submit" name="Submit" value="Gönder">
+                </form>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

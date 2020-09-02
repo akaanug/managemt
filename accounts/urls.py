@@ -71,8 +71,11 @@ urlpatterns = [
     path('autocompleteBrand/', views.autocompleteBrand, name='autocompleteBrand'),
 
     path('reportPage/', views.report, name='report'),
-    path('pdf_view/<str:date>', login_required(views.ViewPDF.as_view()), name="pdf_view"),
-    path('pdf_download/<str:date>', login_required(views.DownloadPDF.as_view()), name="pdf_download"),
+    path('pdf_view/<str:date>/', login_required(views.ViewPDF.as_view()), name="pdf_view"),
+    path('pdf_download/<str:date>/', login_required(views.DownloadPDF.as_view()), name="pdf_download"),
+
+    path('pdf_view/<str:date>/<str:date2>', login_required(views.ViewLogReportPDF.as_view()), name="pdf_log_view"),
+    path('pdf_download/<str:date>/<str:date2>', login_required(views.DownloadLogReportPDF.as_view()), name="pdf_log_download"),
 
 
     path('view_barcode/', views.barcodeView, name="barcode_view"),
@@ -81,7 +84,9 @@ urlpatterns = [
 
     path('stocktakePage/', views.stocktakePage, name="stocktakePage"),
 
-    path('productST/<int:pk>', views.productSTView, name="productST")
+    path('productST/<int:pk>', views.productSTView, name="productST"),
+
+    path('productEntry/<int:pk>/<int:type>', views.productEntry, name="productEntry"),
 
     #path('updateStocktakeProduct/<int:pk>', views.StocktakeProductView.as_view(), name='updateStocktakeProduct'),
 

@@ -20,8 +20,6 @@ class ProductForm(ModelForm):
 
         widgets = {
             'name' : forms.TextInput(attrs={'placeholder': 'Ürün adını gir', }),
-            'dateBought': DateInput(attrs={'type': 'date', }),
-            'editor': forms.HiddenInput(),
             'lastStocktakeTime': forms.HiddenInput(),
         }
 
@@ -32,9 +30,6 @@ class ProductForm(ModelForm):
             'criticalStock' : 'Kritik Stok',
             'criticalStockAmt' : 'Kritik Stok Sayısı',
             'photo' : 'Ürününün Fotoğrafı',
-            'vendor' : 'Alınan Firma',
-            'dateBought' : 'Alış Tarihi',
-            'price' : 'Alış Fiyatı',
             'amount' : 'Stoktaki Miktar',
             'category' : 'Kategori',
             'brand' : 'Marka',
@@ -43,18 +38,19 @@ class ProductForm(ModelForm):
             'editor' : 'Kaydeden Kullanıcı',
         }
 
-        exclude = ( 'invoice', )
+        exclude = ( 'invoice', 'amount' )
 
 class InvoiceForm(ModelForm):
     class Meta:
         model = Invoice
-        fields = ['invoiceCode', 'date', 'sum', 'taxNo']
+        fields = ['invoiceCode', 'date', 'sum', 'taxNo', 'file']
 
         labels = {
             'invoiceCode' : 'Fatura Kodu',
             'date' : 'Fatura Kesim Tarihi',
             'sum' : 'Toplam Tutar',
             'taxNo' : 'Vergi Numarası',
+            'file': 'Fatura Dosyası'
         }
 
 
@@ -65,15 +61,35 @@ class AccountForm(ModelForm):
 
 class ProductSTForm(ModelForm):
     class Meta:
-        model = Product
-        fields = ['amount', 'lastStocktakeTime']
+        model = Logs
+        fields = ['productsLeft', 'lastStocktakeTime']
 
         widgets = {'lastStocktakeTime': forms.HiddenInput(),}
 
         labels = {
-            'amount' : 'Adet',
-            'lastStocktakeTime' : '',
+            'productsLeft' : 'Kalan Adet',
+            'lastStocktakeTime' : "",
         }
+
+
+class TransactionForm(ModelForm):
+    class Meta:
+        model = Logs
+        fields = ['amount', 'price', 'dateBought', 'company']
+
+        widgets = {
+            'type': forms.HiddenInput(),
+            'dateBought': DateInput(attrs={'type': 'date', }),
+        }
+
+        labels = {
+            'amount' : 'Adet',
+            'price' : 'Birim Fiyatı',
+            'company' : 'Satın alınan/ürünün verildiği Firma',
+            'dateBought' : 'Satın Alma/Verme Tarihi',
+        }
+
+        exclude = ( 'invoice', )
 
 
 '''

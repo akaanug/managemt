@@ -94,6 +94,8 @@ function required() {
             {% csrf_token %}
             {{ productForm }}
 
+            {{ logForm }}
+
             <tbody>
                 <tr>
                     <th>
@@ -110,6 +112,15 @@ function required() {
                     </th>
                     <td>
                         {{ invoiceForm.taxNo }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>
+                        {{ invoiceForm.file.label }}:
+                    </th>
+                    <td>
+                        {{ invoiceForm.file }}
                     </td>
                 </tr>
 

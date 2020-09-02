@@ -113,33 +113,57 @@ def products(request):
 
 @login_required(login_url='login')
 def invoice(request, pk):
-    invoice = Invoice.objects.get(id=pk)
-    context = {'invoice': invoice}
+    log = Logs.objects.get(id=pk)
+    invoice = log.invoice
+    context = { 'invoice': invoice }
     return render( request, 'accounts/invoice.html', context )
 
 @login_required(login_url='login')
 def addProduct(request):
-    productForm = ProductForm(initial={ 'editor':request.user.username, })
+    productForm = ProductForm()
     invoiceForm = InvoiceForm()
+    transactionForm = TransactionForm()
+
     if request.method == 'POST':
-        invoiceForm = InvoiceForm(request.POST)
+        invoiceForm = InvoiceForm(request.POST, request.FILES)
         productForm = ProductForm(request.POST, request.FILES)
-        if invoiceForm.is_valid() and productForm.is_valid():
+        transactionForm = TransactionForm(request.POST)
+
+        if invoiceForm.is_valid() and productForm.is_valid() and transactionForm.is_valid():
+
+            newTransaction = transactionForm.save()
             newProduct = productForm.save()
-            update_change_reason(newProduct, "Ürün eklendi.")
             newInvoice = invoiceForm.save()
 
-            #fill invoice based on information in newProduct
-            sum = newProduct.price * newProduct.amount
+            #set attributes of the product
+            newProduct.amount = transactionForm.cleaned_data['amount']
+            newProduct.save()
+
+            update_change_reason(newProduct, "Ürün eklendi.")
+
+
+            #set attributes of the invoice
+            sum = transactionForm.cleaned_data["price"] * transactionForm.cleaned_data["amount"]
             newInvoice.sum = sum
-            newInvoice.vendor = newProduct.vendor
-            newInvoice.date = newProduct.dateBought
+            newInvoice.vendor = transactionForm.cleaned_data["company"]
+            newInvoice.date = transactionForm.cleaned_data["dateBought"]
             newInvoice.save()
 
-            #link invoice to product
-            newProduct.invoice = newInvoice
-            newProduct.save()
-            update_change_reason(newProduct, "Fatura eklendi.")
+            #set attributes of the transaction
+            newTransaction.product = newProduct
+            newTransaction.invoice = newInvoice
+            newTransaction.type = True #adding a new product = making addition
+            newTransaction.editor = request.user.username
+            newTransaction.productsLeft = newTransaction.amount
+            newTransaction.save()
+
+            update_change_reason( newTransaction,
+            "Yeni kayıt. Fiyat={}, Adet={}".format(newTransaction.price, newTransaction.amount) )
+
+
+
+            update_change_reason(newProduct,
+             "{}TL fiyatında {} kadar ürün eklendi.".format(newTransaction.price, newTransaction.amount) )
 
             successMessage = str(newProduct.name) + " adlı ürün başarıyla eklendi."
             messages.success(request, successMessage)
@@ -148,12 +172,13 @@ def addProduct(request):
             message = "Ürün eklenemedi."
             messages.warning(request, message)
 
-    context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
+    context = { 'productForm': productForm, 'invoiceForm': invoiceForm,
+    'logForm': transactionForm }
     return render(request, 'accounts/product-form.html', context)
 
 
 #get change of last two histories as string
-def getHistoryLabel(product):
+def getHistoryLabel(log):
 
     #translate English labels to Turkish
     translateDict = {
@@ -176,9 +201,14 @@ def getHistoryLabel(product):
         "invoice": "Fatura",
         "history": "Tarih",
         "lastStocktakeTime": "Son Sayım Tarihi",
+        "productsLeft": "Kalan Ürünler",
+        "company": "Şirket",
+        "logDate": "Kayıt Tarihi",
+        "type": "Kayıt Tipi",
+        "product": "Ürün",
     }
 
-    histories = product.history.all()
+    histories = log.history.all()
 
     #get last record
     new_record = histories.first()
@@ -205,32 +235,6 @@ def getHistoryLabel(product):
     return s
 
 
-
-@login_required(login_url='login')
-@allowed_users(allowed_roles=['admin'])
-def updateProduct(request, pk):
-    product = Product.objects.get(id=pk)
-    productForm = ProductForm(initial={'editor' : request.user.username}, instance = product)
-    invoiceForm = InvoiceForm(instance = product.invoice)
-    if request.method == 'POST':
-        productForm = ProductForm(request.POST, request.FILES, instance = product)
-        invoiceForm = InvoiceForm( request.POST, instance = product.invoice )
-        if productForm.is_valid() and invoiceForm.is_valid():
-            productForm.save()
-            update_change_reason(product, getHistoryLabel(product))
-            invoiceForm.save()
-
-            successMessage = str(product.name) + " adlı ürün başarıyla güncellendi."
-            messages.success(request, successMessage)
-            return redirect('/products/')
-        else:
-            successMessage = str(product.name) + " adlı ürün güncellenemedi."
-            messages.warning(request, failedMessage)
-
-
-    context = { 'productForm': productForm, 'invoiceForm': invoiceForm }
-    return render(request, 'accounts/product-form.html', context)
-
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['admin'])
 def deleteProduct(request, pk):
@@ -249,18 +253,20 @@ def deleteProduct(request, pk):
 
 @login_required(login_url='login')
 def addInvoice(request, pk):
-    item = Product.objects.get(id=pk)
+    item = Logs.objects.get(id=pk)
     sum = item.price * item.amount
 
     form = InvoiceForm(initial={ 'vendor':item.vendor, 'sum': sum, 'date': item.dateBought })
     if request.method == 'POST':
         form = InvoiceForm(request.POST)
         if form.is_valid():
-            form.save()
-            item.invoice = form.save()
-            item.invoice.vendor = item.vendor
-            item.invoice.save()
+            invoice = form.save()
+            invoice.vendor = item.company
+            invoice.save()
+
+            item.invoice = invoice
             item.save()
+
             return redirect('/')
 
     context = { 'form': form, 'item' : item }
@@ -390,6 +396,7 @@ class ViewPDF(View):
 
         #pass date parameter as string and convert it back to datetime.datetime
         date = kwargs['date']
+
         dateObj = dt.strptime(date, '%Y-%m-%d')
 
         #dateObj points to the end of the day
@@ -415,10 +422,6 @@ class ViewPDF(View):
             if hist is not None:
                 products.append( hist )
 
-        sum = 0
-        for product in products:
-            sum += product.price * product.amount
-
         #get beginning of the day in order to find all operations in that day
         time = datetime.time(0,0,0)
         beginningOfTheDay = dt.combine(dateObj, time)
@@ -442,7 +445,6 @@ class ViewPDF(View):
 
         products = {
             'products': products,
-            'sum': sum,
             'date': date,
             'allHistories': allHistories,
         }
@@ -530,12 +532,20 @@ class DownloadPDF(View):
 @login_required(login_url='login')
 def report(request):
     current_date = dt.today().date()
-    date = current_date
+    date1 = current_date
+    date2 = current_date
 
     if request.method=="POST":
-        date = request.POST.get('date')
+        #handle two different forms separately
+        print(request.POST)
+        if 'date1' in request.POST:
+            date1 = request.POST.get('date1')
 
-    context = { 'date' : date }
+        if 'date2' in request.POST:
+            date2 = request.POST.get('date2')
+
+
+    context = { 'date1' : date1, 'date2' : date2 }
     return render(request, 'accounts/reportPage.html', context)
 
 
@@ -581,7 +591,8 @@ def barcodeView(request):
 @login_required(login_url='login')
 def productPage(request, pk):
     product = Product.objects.get(id=pk)
-    context = {'product': product}
+    logs = Logs.objects.filter(product=product)
+    context = {'product': product, 'logs': logs}
     return render( request, 'accounts/productPage.html', context )
 
 @login_required(login_url='login')
@@ -666,25 +677,27 @@ def stocktakePage(request):
     time = datetime.time(0,0,0)
     beginningOfTheDay = dt.combine(dateObj, time)
 
-    stocktakeProducts = Product.objects.filter(
+    stocktakeProducts = Logs.objects.filter(
         lastStocktakeTime__isnull=False
     ).filter(
         lastStocktakeTime__gt=beginningOfTheDay
     )
 
-    nullST = Product.objects.filter(lastStocktakeTime__isnull=True)
-    lteToday = Product.objects.filter(lastStocktakeTime__lte=beginningOfTheDay)
-    products = nullST | lteToday
+    nullST = Logs.objects.filter(lastStocktakeTime__isnull=True)
+    lteToday = Logs.objects.filter(lastStocktakeTime__lte=beginningOfTheDay)
+    logs = nullST | lteToday
+
+    logs = logs.filter(type=True)
 
     totalLoss = 0
     lossDict = {}
 
     #if there is not any product left that is not in stocktake
-    if products.count() is 0:
+    if logs.count() is 0:
         lastHistories = []
 
         #find total loss and last histories that are
-        #genereated from stocktake page
+        #generated from stocktake page
         for st in stocktakeProducts:
             history = st.history.all()
             for hist in history:
@@ -697,61 +710,265 @@ def stocktakePage(request):
                         lossStr = s.split('=')[1]
                         lossStr = lossStr[:-4]
                         lossFloat = float(lossStr)
-                        lossDict.update( {st.name:lossFloat} )
+                        lossDict.update( {st.product.name:lossFloat} )
                         totalLoss += lossFloat
                     break
-
-
-
-
-    productFilter = ProductFilter(request.GET, queryset=products)
-    products = productFilter.qs
 
     message = "Sayım sayfası her günün başında yenilenir. " + "Sayım tamamlandığında kayıp ürünlerin özetini ve toplam zararı görebilirsiniz."
     messages.info(request, message)
 
-    context = { 'stocktakeProducts': stocktakeProducts, 'products': products,
-     'productFilter': productFilter, 'totalLoss': totalLoss, 'lossDict': lossDict }
+    context = { 'stocktakeProducts': stocktakeProducts, 'logs': logs,
+    'totalLoss': totalLoss, 'lossDict': lossDict }
 
     return render(request, 'accounts/stocktakePage.html', context)
 
 @login_required(login_url='login')
 def productSTView(request, pk):
-    product = Product.objects.get(id=pk)
-    productForm = ProductSTForm(initial={'lastStocktakeTime': timezone.now()},
-     instance = product )
+    log = Logs.objects.get(id=pk)
+    productForm = ProductSTForm( instance = log,
+     initial={'lastStocktakeTime': timezone.now()} )
+
     if request.method == 'POST':
-        productForm = ProductSTForm(request.POST, instance = product)
-        oldAmt = product.amount
+        productForm = ProductSTForm(request.POST, instance = log)
+        oldAmt = log.productsLeft
         if productForm.is_valid():
-            productForm.save()
-            newAmt = product.amount
+            log = productForm.save()
+            newAmt = log.productsLeft
 
             #find loss if any
             loss = 0
             if oldAmt <= newAmt:
                 loss = 0
             else:
-                loss = (oldAmt - newAmt) * product.price
+                loss = (oldAmt - newAmt)
+
+            log.product.amount = log.product.amount - loss
+            log.product.save()
+
+            reasonStr = "SAYIM: " + getHistoryLabel(log.product)
+
+            update_change_reason(log.product, reasonStr )
+
+            loss = loss * log.price
 
             if loss == 0:
                 r = "Zarar Yok."
             else:
                 r = str(oldAmt - newAmt) + " adet ürün eksik. Zarar = " + str(loss) + " TL."
 
-            reason = "*SAYIM: " + getHistoryLabel(product) + r
 
-            update_change_reason(product, reason)
+            reason = "*SAYIM: " + getHistoryLabel(log) + r
 
-            message = str(product.name) + " adlı ürünün sayımı başarılı."
+            update_change_reason(log, reason)
+
+            message = str(log.product) + " adlı ürünün sayımı başarılı."
             messages.success(request, message)
             return redirect('/stocktakePage/')
         else:
-            message = str(product.name) + " adlı ürünün sayımı başarısız."
+            message = str(log.product) + " adlı ürünün sayımı başarısız."
             messages.warning(request, message)
 
     context = { 'form': productForm, }
     return render(request, 'accounts/updateStocktakeProduct.html', context)
+
+@login_required(login_url='login')
+def productEntry(request, pk, type):
+
+    product = Product.objects.get(id=pk)
+
+    if type == 1:
+        type = True
+    else:
+        type = False
+
+    product = Product.objects.get(id=pk)
+    invoiceForm = InvoiceForm()
+    logForm = TransactionForm()
+
+    if request.method == 'POST':
+        invoiceForm = InvoiceForm( request.POST, request.FILES )
+        logForm = TransactionForm(request.POST)
+        if logForm.is_valid() and invoiceForm.is_valid():
+            newTransaction = logForm.save()
+            newTransaction.type = type
+
+            invoice = invoiceForm.save()
+            invoice.vendor = newTransaction.company
+            invoice.date = newTransaction.dateBought
+            invoice.save()
+
+            newTransaction.invoice = invoice
+            newTransaction.product = product
+            newTransaction.editor = request.user.username
+
+            sum = 0
+            if type is True: #addition
+                invoice.sum = newTransaction.amount * newTransaction.price
+                invoice.save()
+                product.amount = newTransaction.amount + product.amount
+                newTransaction.productsLeft = newTransaction.amount
+                newTransaction.save()
+                update_change_reason(newTransaction,
+                "{} TL olan {} kadar ürün eklendi.".format(newTransaction.price,
+                newTransaction.amount ))
+
+            else: #remove the amt of product starting from the oldest
+                product.amount = product.amount - newTransaction.amount
+                logs = Logs.objects.order_by('logDate').filter(type=True) #oldest to newest
+                amt = newTransaction.amount #amount to substract
+                for log in logs:
+                    if log.productsLeft <= 0:
+                        continue
+
+                    if amt == 0:
+                        break
+
+                    if log.productsLeft <= amt:
+                        sum += log.productsLeft * log.price
+                        amt = amt - log.productsLeft
+                        log.productsLeft = 0
+                        log.save()
+                        update_change_reason(log,
+                        "{} TL olan {} kadar ürün çıkarıldı.".format(log.price,
+                        log.productsLeft ))
+                    else:
+                        sum += amt * log.price
+                        log.productsLeft = log.productsLeft - amt
+                        temp = amt
+                        amt = 0
+                        log.save()
+                        update_change_reason(log,
+                        "{} TL olan {} kadar ürün çıkarıldı.".format(log.price,
+                        temp ))
+
+            #save the sum of the invoice of this log
+            if type is False:
+                invoice.sum = sum
+                invoice.save()
+
+            product.save()
+
+            newTransaction.save()
+
+            update_change_reason(product, getHistoryLabel(product))
+
+            successMessage = str(product.name) + " adlı ürün başarıyla güncellendi."
+            messages.success(request, successMessage)
+            return redirect('/products/')
+        else:
+            failedMessage = str(product.name) + " adlı ürün güncellenemedi."
+            messages.warning(request, failedMessage)
+
+
+    context = { 'logForm': logForm, 'invoiceForm': invoiceForm, 'type': type,
+                'product': product }
+    return render(request, 'accounts/productEntry.html', context)
+
+
+@login_required(login_url='login')
+def updateProduct(request, pk):
+    product = Product.objects.get(id=pk)
+    productForm = ProductForm(initial={'editor' : request.user.username}, instance = product)
+    if request.method == 'POST':
+        productForm = ProductForm(request.POST, request.FILES, instance = product)
+        if productForm.is_valid():
+            productForm.save()
+            update_change_reason(product, getHistoryLabel(product))
+
+            successMessage = str(product.name) + " adlı ürün başarıyla güncellendi."
+            messages.success(request, successMessage)
+            return redirect('/products/')
+        else:
+            successMessage = str(product.name) + " adlı ürün güncellenemedi."
+            messages.warning(request, failedMessage)
+
+
+    context = { 'productForm': productForm }
+    return render(request, 'accounts/product-form.html', context)
+
+
+class ViewLogReportPDF(View):
+    def get(self, request, *args, **kwargs):
+
+        utc = pytz.UTC
+
+        #pass date parameter as string and convert it back to datetime.datetime
+        date = kwargs['date']
+        date2 = kwargs['date2']
+
+        dateObj = dt.strptime(date, '%Y-%m-%d')
+        dateObj2 = dt.strptime(date2, '%Y-%m-%d')
+
+        #dateObj points to the end of the day
+        time = datetime.time(0,0,0)
+        startOfdate = dt.combine(dateObj, time)
+
+        time = datetime.time(23,59,59)
+        endOfdate2 = dt.combine(dateObj2, time)
+
+        #get all products in specified date
+        qs = Logs.objects.filter(logDate__lte=endOfdate2, logDate__gte=startOfdate)
+
+        #logs of incoming products
+        ins = qs.filter(type=True)
+
+        #logs of outgoing products
+        outs = qs.filter(type=False)
+
+
+        data = {
+            'ins': ins,
+            'outs': outs,
+            'date': date,
+            'date2': date2,
+        }
+
+        pdf = render_to_pdf('accounts/pdf_template_logs.html', data)
+        return HttpResponse(pdf, content_type='application/pdf')
+
+
+class DownloadLogReportPDF(View):
+    def get(self, request, *args, **kwargs):
+
+        utc = pytz.UTC
+
+        #pass date parameter as string and convert it back to datetime.datetime
+        date = kwargs['date']
+        date2 = kwargs['date2']
+
+        dateObj = dt.strptime(date, '%Y-%m-%d')
+        dateObj2 = dt.strptime(date2, '%Y-%m-%d')
+
+        #dateObj points to the end of the day
+        time = datetime.time(0,0,0)
+        startOfdate = dt.combine(dateObj, time)
+
+        time = datetime.time(23,59,59)
+        endOfdate2 = dt.combine(dateObj2, time)
+
+        #get all products in specified date
+        qs = Logs.objects.filter(logDate__lte=endOfdate2, logDate__gte=startOfdate)
+
+        #logs of incoming products
+        ins = qs.filter(type=True)
+
+        #logs of outgoing products
+        outs = qs.filter(type=False)
+
+
+        data = {
+            'ins': ins,
+            'outs': outs,
+            'date': date,
+            'date2': date2,
+        }
+
+        pdf = render_to_pdf('accounts/pdf_template_logs.html', data)
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "DTS_Giris_Cıkıs_Rapor_%s.pdf" %(date)
+        content = "attachment; filename=%s" %(filename)
+        response['Content-Disposition'] = content
+        return response
 
 
 '''

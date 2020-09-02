@@ -28,7 +28,7 @@
     <!-- Content for Static Frame 'header_frame' -->
     <div id="header_content" class='header'>
     	<h3>BİLKENT CYBERPARK Ankara Teknoloji Geliştirme Bölgesi Kurucu ve İşletici A.Ş.</h3>
-        <h3>{{date}} TARİHLİ RAPOR</h3>
+        <h3>{{date}} ile {{date2}} TARİHLERİ ARASINDA YAPILAN GİRİŞ/ÇIKIŞLARIN RAPORU</h3>
     </div>
 
     <!-- Content for Static Frame 'footer_frame' -->
@@ -37,35 +37,31 @@
     </div>
 
     <!-- HTML Content -->
-    <h3>Seçilen Günde Stoktaki Ürünler:</h3>
-    {% if products|length == 0 %}
-        <p>Girilen tarihte stokta kayıtlı ürün bulunmamakta.</p>
+    <h3>Seçilen Aralıktaki Girişler:</h3>
+    {% if ins|length == 0 %}
+        <p>Girilen tarihte giriş yapılmamıştır.</p>
     {% else %}
     <table class="table">
         <tr>
             <th align="left">Ürün Adı</th>
-            <th align="left">Barkod</th>
-            <th align="left">Ürün kodu</th>
-            <th align="left">Satın Alınan Firma</th>
+            <th align="left">Ürün Barkodu</th>
+            <th align="left">Alınan Adet</th>
+            <th align="left">Alış Fiyatı</th>
+            <th align="left">Kaydeden Kullanıcı</th>
             <th align="left">Kayıt Tarihi</th>
-            <th align="left">Fiyat</th>
-            <th align="left">Adet</th>
-            <th align="left">Kategori</th>
-            <th align="left">Marka</th>
-            <th align="left">Model</th>
+            <th align="left">Alınan Şirket</th>
+            <th align="left">Alış Tarihi</th>
         </tr>
-        {% for product in products %}
+        {% for log in ins %}
             <tr align="left">
-                <td>{{ product.name }}</td>
-                <td>{{ product.barcode }}</td>
-                <td>{{ product.code }}</td>
-                <td>{{ product.vendor }}</td>
-                <td>{{ product.regDate }}</td>
-                <td>{{ product.price }}</td>
-                <td>{{ product.amount }}</td>
-                <td>{{ product.category }}</td>
-                <td>{{ product.brand }}</td>
-                <td>{{ product.model }}</td>
+                <td>{{ log.product.name }}</td>
+                <td>{{ log.product.barcode }}</td>
+                <td>{{ log.amount }}</td>
+                <td>{{ log.price }}</td>
+                <td>{{ log.editor }}</td>
+                <td>{{ log.logDate }}</td>
+                <td>{{ log.company }}</td>
+                <td>{{ log.dateBought }}</td>
             </tr>
         {% endfor %}
     </table>
@@ -75,32 +71,35 @@
 
     <br><br><br>
 
-    <h3>Seçilen Günde Yapılan İşlemler:</h3>
-    {% if allHistories|length == 0 %}
-        <p>Girilen tarihte işlem yapılmamıştır.</p>
+    <h3>Seçilen Aralıktaki Çıkışlar:</h3>
+    {% if outs|length == 0 %}
+        <p>Girilen tarihte giriş yapılmamıştır.</p>
     {% else %}
     <table class="table">
         <tr>
             <th align="left">Ürün Adı</th>
             <th align="left">Ürün Barkodu</th>
-            <th align="left">Değişiklik Yapan</th>
-            <th align="left">Değişikliğin Sebebi</th>
+            <th align="left">Verilen Adet</th>
+            <th align="left">Kaydeden Kullanıcı</th>
+            <th align="left">Kayıt Tarihi</th>
+            <th align="left">Verilen Şirket</th>
+            <th align="left">Alış Tarihi</th>
         </tr>
-
-        {% for history in allHistories %}
+        {% for log in outs %}
             <tr align="left">
-                <td>{{ history.name }}</td>
-                <td>{{ history.barcode }}</td>
-                <td>{{ history.history_user }}</td>
-                <td>{{ history.history_change_reason }}</td>
+                <td>{{ log.product.name }}</td>
+                <td>{{ log.product.barcode }}</td>
+                <td>{{ log.amount }}</td>
+                <td>{{ log.editor }}</td>
+                <td>{{ log.logDate }}</td>
+                <td>{{ log.company }}</td>
+                <td>{{ log.dateBought }}</td>
             </tr>
         {% endfor %}
     </table>
 
-    {% endif %}
-
-
     <hr>
+    {% endif %}
 
 
 </body>

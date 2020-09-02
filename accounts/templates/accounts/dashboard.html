@@ -14,36 +14,32 @@
 			<div class="btn-group" role="group" aria-label="Basic example">
 				<a class="btn btn-primary" href="{% url 'addProduct' %}">Yeni Ürün Kaydet</a>
 				<a class="btn btn-warning" href="{% url 'barcode_view' %}">Barkod Okutarak Ara</a>
-				<a class="btn btn-success" href="{% url 'addProductFromBarcode' %}">Barkod Okutarak Yeni Ürün Kaydet</a>
+				<!--<a class="btn btn-success" href="{% url 'addProductFromBarcode' %}">Barkod Okutarak Yeni Ürün Kaydet</a>-->
 
 			</div>
 			<table class="table table-sm">
 				<tr>
-					<th></th>
 					<th>Ürün</th>
 					<th>Barkod</th>
-					<th>Alış Tarihi</th>
 					<th>Adet</th>
-					<th>Güncelle</th>
 					<th>Sil</th>
+					<th>Ürün Bilgilerini Güncelle</th>
+					<th>Giriş/Çıkış Yap</th>
 				</tr>
 
 				{% for product in products %}
 				<tr>
-					{% if product.invoice is not Null %}
-						<td><a class="btn btn-sm btn-info" href="{% url 'invoice-path' product.invoice.id %}">Faturayı Gör</a></td>
-					{% else %}
-						<td><a class="btn btn-sm btn-danger" href="{% url 'addInvoice' product.id %}">Fatura Ekle</a></td>
-					{% endif %}
-
 					<td>
 						<a href="{% url 'productPage' product.id %}">{{ product.name }}</a>
 					</td>
 					<td>{{product.barcode}}</td>
-					<td>{{product.dateBought}}</td>
 					<td>{{product.amount}}</td>
+					<td><a class="btn btn-sm btn-danger" href="{% url 'deleteProduct' product.id %}">Ürünü Sil</a></td>
 					<td><a class="btn btn-sm btn-info" href="{% url 'updateProduct' product.id %}">Güncelle</a></td>
-					<td><a class="btn btn-sm btn-danger" href="{% url 'deleteProduct' product.id %}">Sil</a></td>
+					<td>
+						<a class="btn btn-sm btn-primary" href="{% url 'productEntry' product.id 1 %}">Ürün Girişi</a>
+						<a class="btn btn-sm btn-warning" href="{% url 'productEntry' product.id 0 %}">Ürün Çıkışı</a>
+					</td>
 				</tr>
 				{% endfor %}
 
