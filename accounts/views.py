@@ -114,8 +114,7 @@ def products(request):
 @login_required(login_url='login')
 def invoice(request, pk):
     log = Logs.objects.get(id=pk)
-    invoice = log.invoice
-    context = { 'invoice': invoice }
+    context = { 'log': log, 'invoice': log.invoice }
     return render( request, 'accounts/invoice.html', context )
 
 @login_required(login_url='login')
@@ -258,7 +257,7 @@ def addInvoice(request, pk):
 
     form = InvoiceForm(initial={ 'vendor':item.vendor, 'sum': sum, 'date': item.dateBought })
     if request.method == 'POST':
-        form = InvoiceForm(request.POST)
+        form = InvoiceForm(request.POST, request.FILES)
         if form.is_valid():
             invoice = form.save()
             invoice.vendor = item.company
@@ -275,17 +274,50 @@ def addInvoice(request, pk):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['admin'])
 def updateInvoice(request, pk):
-    invoice = Invoice.objects.get(id=pk)
+    log = Logs.objects.get(id=pk)
+    invoice = log.invoice
     form = InvoiceForm(instance = invoice)
 
     if request.method == 'POST':
-        form = InvoiceForm(request.POST, instance = invoice)
+        form = InvoiceForm(request.POST, request.FILES, instance = invoice)
         if form.is_valid():
             form.save()
-            return redirect('/')
+
+            print(form.cleaned_data)
+
+            successMessage = str(invoice.invoiceCode) + " kodlu fatura başarıyla güncellendi."
+            messages.success(request, successMessage)
+            return redirect( '/productPage/{}'.format(log.product.id) )
+        else:
+            successMessage = str(invoice.invoiceCode) + " kodlu fatura güncellenemedi"
+            messages.warning(request, failedMessage)
 
     context = { 'form': form }
     return render(request, 'accounts/invoice-form.html', context)
+
+
+@login_required(login_url='login')
+def updateProduct(request, pk):
+    product = Product.objects.get(id=pk)
+    productForm = ProductForm(initial={'editor' : request.user.username}, instance = product)
+
+    if request.method == 'POST':
+        productForm = ProductForm(request.POST, request.FILES, instance = product)
+        if productForm.is_valid():
+            productForm.save()
+            update_change_reason(product, getHistoryLabel(product))
+
+            successMessage = str(product.name) + " adlı ürün başarıyla güncellendi."
+            messages.success(request, successMessage)
+            return redirect('/products/')
+        else:
+            successMessage = str(product.name) + " adlı ürün güncellenemedi."
+            messages.warning(request, failedMessage)
+
+
+    context = { 'productForm': productForm }
+    return render(request, 'accounts/product-form.html', context)
+
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['admin'])
@@ -490,10 +522,6 @@ class DownloadPDF(View):
             if hist is not None:
                 products.append( hist )
 
-        sum = 0
-        for product in products:
-            sum += product.price * product.amount
-
         #get beginning of the day in order to find all operations in that day
         time = datetime.time(0,0,0)
         beginningOfTheDay = dt.combine(dateObj, time)
@@ -517,7 +545,6 @@ class DownloadPDF(View):
 
         products = {
             'products': products,
-            'sum': sum,
             'date': date,
             'allHistories': allHistories,
         }
@@ -542,6 +569,7 @@ def report(request):
             date1 = request.POST.get('date1')
 
         if 'date2' in request.POST:
+            date1 = request.POST.get('date1')
             date2 = request.POST.get('date2')
 
 
@@ -745,7 +773,12 @@ def productSTView(request, pk):
             log.product.amount = log.product.amount - loss
             log.product.save()
 
-            reasonStr = "SAYIM: " + getHistoryLabel(log.product)
+            r = getHistoryLabel(log.product)
+
+            if r == "":
+                r = "Kayıp ürün yok."
+
+            reasonStr = "{} Tarihli Giriş İçin Sayım: ".format( log.logDate.strftime("%d-%m-%Y") ) + r
 
             update_change_reason(log.product, reasonStr )
 
@@ -854,7 +887,7 @@ def productEntry(request, pk, type):
 
             successMessage = str(product.name) + " adlı ürün başarıyla güncellendi."
             messages.success(request, successMessage)
-            return redirect('/products/')
+            return redirect('/productPage/{}'.format(product.pk))
         else:
             failedMessage = str(product.name) + " adlı ürün güncellenemedi."
             messages.warning(request, failedMessage)

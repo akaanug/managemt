@@ -4,16 +4,17 @@
 	  <th>Ürün Adı</th>
 	  <th>Barkod</th>
 	  <th>Adet</th>
-	  <th></th>
+	  <th>Kayıt Tarihi</th>
+      <th>
 	</tr>
   </thead>
   <tbody>
 	  {% for log in logs %}
 		  <tr>
-			  <td>{{ log.product }}</td>
-			  <td>{{ log.barcode }}</td>
-			  <td>{{ log.logDate }}</td>
-              <td>{{ log.productsLeft }}</td>
+			  <td>{{ log.product.name }}</td>
+			  <td>{{ log.product.barcode }}</td>
+			  <td>{{ log.productsLeft }}</td>
+              <td>{{ log.logDate }}</td>
 			  <td>
 				  <a class="btn btn-sm btn-info" href="{% url 'productST' log.id %}">Sayıma Ekle</a>
 			  </td>
@@ -22,10 +23,11 @@
   </tbody>
   <tfoot>
 	<tr>
-		<th>Ürün Adı</th>
-		<th>Barkod</th>
-		<th>Giriş Tarihi</th>
-        <th>Kalan Ürün Sayısı</th>
+        <th>Ürün Adı</th>
+        <th>Barkod</th>
+        <th>Adet</th>
+        <th>Kayıt Tarihi</th>
+        <th></th>
 	</tr>
   </tfoot>
 </table>

@@ -14,21 +14,14 @@
 
   //if date form is empty, do not submit form
   function validateForm2() {
-    var a = document.forms["dateForm2"]["date"].value;
-    if (!a) {
+    var a = document.forms["dateForm2"]["date1"].value;
+    var b = document.forms["dateForm2"]["date2"].value;
+    if ( !( a && b ) ) {
       alert("Lütfen Bir Tarih Girin");
       return false;
     }
   }
 
-  //if date form is empty, do not submit form
-  function validateForm3() {
-    var a = document.forms["dateForm3"]["date"].value;
-    if (!a) {
-      alert("Lütfen Bir Tarih Girin");
-      return false;
-    }
-  }
 </script>
 
 
@@ -58,15 +51,10 @@
 					<form id="dateForm2" onsubmit="return validateForm2()" action="" method="post">
 						{% csrf_token %}
 						<label for="tarih"><:</label>
-						<input type="date" id="date" name="date1" value="{{ date1|date:"Y-m-d" }}">
-						<input type="submit" value="Seç">
-					</form>
-
-                    <form id="dateForm3" onsubmit="return validateForm3()" action="" method="post">
-						{% csrf_token %}
-						<label for="tarih">>:</label>
-						<input type="date" id="date" name="date2" value="{{ date2|date:"Y-m-d" }}">
-						<input type="submit" value="Seç">
+						<input type="date" id="date1" name="date1" value="{{ date1|date:"Y-m-d" }}">
+                        <label for="tarih">>:</label>
+						<input type="date" id="date2" name="date2" value="{{ date2|date:"Y-m-d" }}">
+                        <input type="submit" value="Seç">
 					</form>
 
 					 <div class="text-center">

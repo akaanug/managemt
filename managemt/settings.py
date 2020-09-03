@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'lt-xr@gs*9hk6liido+@#!6rrgu_$g066#j+ye#@j&!uh+2u#i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['managemt.herokuapp.com', '127.0.0.1']
 
@@ -117,12 +117,14 @@ DATABASES = {
 }
 '''
 
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+'''
 
 
 #add postgresql
@@ -206,7 +208,6 @@ AWS_STORAGE_BUCKET_NAME = aws_bucket_name
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 '''
 <?xml version="1.0" encoding="UTF-8"?>
