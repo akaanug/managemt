@@ -1,0 +1,28 @@
+
+    #logo{
+    }
+
+    body{
+        background-color: #ebeff5;
+    }
+
+
+    #notInStock{
+        background-color: #4cb4c7;
+    }
+
+    #stockNotTaken{
+        background-color: #7CD1C0;
+    }
+
+    #stockTaken{
+        background-color: #fffc61;
+    }
+
+    #criticalTable{
+        background-color: #7CD1C0;
+    }
+
+    #red{
+        color: red;
+    }
