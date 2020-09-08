@@ -20,7 +20,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'lt-xr@gs*9hk6liido+@#!6rrgu_$g066#j+ye#@j&!uh+2u#i'
+sk = os.environ['DJANGO_SECRETKEY']
+SECRET_KEY = sk
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -124,12 +125,10 @@ DATABASES = {
     }
 }
 
-
 #add postgresql
 import dj_database_url
 db_from_env = dj_database_url.config(conn_max_age=600)
 DATABASES['default'].update(db_from_env)
-
 
 
 # Password validation
