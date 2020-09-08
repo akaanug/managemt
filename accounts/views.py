@@ -847,7 +847,7 @@ def productEntry(request, pk, type):
 
             else: #remove the amt of product starting from the oldest
                 product.amount = product.amount - newTransaction.amount
-                logs = Logs.objects.order_by('logDate').filter(type=True) #oldest to newest
+                logs = Logs.objects.order_by('logDate').filter(product=product).filter(type=True) #oldest to newest
                 amt = newTransaction.amount #amount to substract
                 for log in logs:
                     if log.productsLeft <= 0:
