@@ -1,6 +1,6 @@
 # managemt
 
-This project features inventory management modules including reporting, detailed tracking of the products through their history and log entries, authentication and authorization, real- time barcode reader, an easy-to-use user interface, a dynamic stocktake page and an admin page to reach and modify certain settings in the application. 
+This project features inventory management modules including reporting, detailed tracking of the products through their history and log entries, authentication and authorization, real-time barcode reader, an easy-to-use user interface, a dynamic stocktake page and an admin page to reach and modify certain settings in the application. 
 
 I used the <b>Heroku</b> server to host the application, <b>PostgreSQL</b>(MSSQL for production) database to store the data in the demo and <b>AWS(Amazon Web Server) S3 bucket</b> to store the images and invoice files.
 
