@@ -16,7 +16,11 @@
 				<tr>
 					<td>{{ history.history_date }}</td>
 					<td>{{ history.history_user }}</td>
-					<td>{{ history.history_change_reason }}</td>
+					{% if history.history_change_reason is Null %}
+						<td>Ürün girişi.</td>
+					{% else %}
+						<td>{{ history.history_change_reason }}</td>
+					{% endif %}
 				<tr>
                 {% endfor %}
 
