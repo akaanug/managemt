@@ -20,7 +20,7 @@ PyPDF2==1.26.0
 python-dateutil==2.8.1
 pytz==2020.1
 redis==3.5.3
-reportlab==3.5.46
+reportlab==3.5.55
 s3transfer==0.3.3
 six==1.15.0
 sqlparse==0.3.1
